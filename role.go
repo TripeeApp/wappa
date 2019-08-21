@@ -44,10 +44,10 @@ func (rs *RoleService) Read(ctx context.Context, id, desc string) (*RoleResponse
 }
 
 // Create creates a role resource in the API.
-func (rs *RoleService) Create(ctx context.Context, u *Role) (*DefaultResponse, error) {
+func (rs *RoleService) Create(ctx context.Context, r *Role) (*DefaultResponse, error) {
 	res := &DefaultResponse{}
 
-	if err := rs.client.Request(ctx, http.MethodPost, roleEndpoint.Action(create), u, res); err != nil {
+	if err := rs.client.Request(ctx, http.MethodPost, roleEndpoint.Action(create), r, res); err != nil {
 		return nil, err
 	}
 
