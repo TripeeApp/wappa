@@ -67,7 +67,7 @@ func (us *UnityService) Create(ctx context.Context, u *Unity) (*DefaultResponse,
 	return res, nil
 }
 
-// Updated edit the unity information.
+// Updated edits the unity information.
 func (us *UnityService) Update(ctx context.Context, u *Unity) (*DefaultResponse, error) {
 	res := &DefaultResponse{}
 
