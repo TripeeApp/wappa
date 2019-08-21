@@ -13,6 +13,90 @@ import (
 	"time"
 )
 
+type testTable struct {
+	name	string
+	call	func(ctx context.Context, req requester) (resp interface{}, err error)
+	ctx	context.Context
+	method	string
+	path	endpoint
+	body	interface{}
+	wantRes	interface{}
+}
+
+type testTableError struct {
+	name	string
+	call	func(req requester) error
+	err	error
+}
+
+type testRequester struct{
+	body	interface{}
+	ctx	context.Context
+	err	error
+	method	string
+	output	reflect.Value
+	path	endpoint
+
+}
+
+func (t *testRequester) Request(ctx context.Context, method string, path endpoint, body, output interface{}) error {
+	t.ctx = ctx
+	t.method = method
+	t.path = path
+	t.body = body
+
+	if t.output.IsValid() {
+		out := reflect.ValueOf(output)
+		if !out.IsNil() && out.Elem().CanSet() {
+			out.Elem().Set(t.output)
+		}
+	}
+
+	return t.err
+}
+
+func test(tc testTable) func(t *testing.T) {
+	return func(t *testing.T) {
+		req := &testRequester{output: reflect.ValueOf(tc.wantRes).Elem()}
+
+		res, err := tc.call(tc.ctx, req)
+		if err != nil {
+			t.Fatalf("got error while calling User %s: %s, want nil", tc.name, err.Error())
+		}
+
+		if !reflect.DeepEqual(req.ctx, tc.ctx) {
+			t.Errorf("got Requester Context %+v; want %+v.", req.ctx, tc.ctx)
+		}
+
+		if req.method != tc.method {
+			t.Errorf("got request method: %s; want %s.", req.method, tc.method)
+		}
+
+		if req.path != tc.path {
+			t.Errorf("got request path: %s; want %s.", req.path, tc.path)
+		}
+
+		if !reflect.DeepEqual(req.body, tc.body) {
+			t.Errorf("got request body: %+v; want %+v.", req.body, tc.body)
+		}
+
+		if !reflect.DeepEqual(res, tc.wantRes) {
+			t.Errorf("got response: %+v; want %+v.", res, tc.wantRes)
+		}
+	}
+}
+
+func testError(tc testTableError) func(t *testing.T) {
+	return func(t *testing.T) {
+		req := &testRequester{err: tc.err}
+
+		err := tc.call(req)
+		if !reflect.DeepEqual(err, tc.err) {
+			t.Errorf("got error: %s; want %s.", err, tc.err)
+		}
+	}
+}
+
 func TestNew(t *testing.T) {
 	testCases := []struct{
 		host	*url.URL
