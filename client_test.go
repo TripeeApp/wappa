@@ -48,7 +48,7 @@ func TestClientRequest(t *testing.T) {
 	emptyObj := []byte(`{}`)
 
 	testCases := []struct{
-		endpoint string
+		endpoint endpoint
 		method	 string
 		body	 interface{}
 		server	 *httptest.Server
@@ -71,7 +71,7 @@ func TestClientRequest(t *testing.T) {
 			http.MethodGet,
 			nil,
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
-				if want := "/api/foo"; r.URL.Path != want {
+				if want := "/foo"; r.URL.Path != want {
 					t.Errorf("got Request.URL: %s; want %s.", r.URL.Path, want)
 				}
 				w.Write(emptyObj)
@@ -144,7 +144,7 @@ func TestClientRequest(t *testing.T) {
 
 func TestClientRequestError(t *testing.T) {
 	testCases := []struct{
-		path		string
+		path		endpoint
 		method		string
 		body		interface{}
 		server		*httptest.Server

@@ -16,14 +16,29 @@ const (
 	errFmt = `Error while request the LigueTaxi API: %s; Status Code: %d; Body: %s.`
 )
 
+// ResponseError contains the default error porperties
+// returnes by the API.
+type ResponseError struct {
+	Code int
+	Message int
+}
+
+// DefaultResponse contains the basics porperties
+// all requests to the Wappa API returns.
+type DefaultResponse struct {
+	Success bool
+	Quantity int `json:"quantidade"`
+	Error ResponseError
+}
+
 // requester is the interface that performs a request
 // to the server and parses the payload.
 type requester interface{
-	Request(ctx context.Context, method string, path string, body, output interface{}) error
+	Request(ctx context.Context, method string, path endpoint, body, output interface{}) error
 }
 
 // ApiError implements the error interface
-// and returns infos from the request
+// and returns infos from the request.
 type ApiError struct {
 	statusCode int
 	body       []byte
@@ -55,8 +70,8 @@ func New(host *url.URL, client *http.Client) *Client {
 
 // Request created an API request. A relative path can be providaded
 // in which case it is resolved relative to the host of the Client.
-func (c *Client) Request(ctx context.Context, method string, path string, body, output interface{}) error {
-	u, err := c.host.Parse(fmt.Sprintf("api/%s", path))
+func (c *Client) Request(ctx context.Context, method string, path endpoint, body, output interface{}) error {
+	u, err := c.host.Parse(path.String())
 	if err != nil {
 		return err
 	}
