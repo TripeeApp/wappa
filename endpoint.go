@@ -6,10 +6,11 @@ import(
 	"strings"
 )
 
+// Actions
 const (
-	list		= `listar`
+	read		= `listar`
 	create		= `cadastrar`
-	edit		= `alterar`
+	update		= `alterar`
 	activate	= `ativar`
 	inactivate	= `inativar`
 )
@@ -17,6 +18,7 @@ const (
 // endpoint represents the path to the resource.
 type endpoint string
 
+// Action returns a new endpoint suffixed with the action.
 func (e endpoint) Action(a string) endpoint {
 	if strings.Index(e.String(), "api") != 0 {
 		e = e.prefix()
@@ -24,6 +26,7 @@ func (e endpoint) Action(a string) endpoint {
 	return endpoint(fmt.Sprintf("%s/%s", e, a))
 }
 
+// Query returns a new endpoint with the query parameters appended.
 func (e endpoint) Query(v url.Values) endpoint {
 	if strings.Index(e.String(), "api") != 0 {
 		e = e.prefix()
@@ -31,12 +34,14 @@ func (e endpoint) Query(v url.Values) endpoint {
 	return endpoint(fmt.Sprintf("%s?%s", e, v.Encode()))
 }
 
+// String returns a string of endpoint type
+func (e endpoint) String() string {
+	return string(e)
+}
+
 func (e endpoint) prefix() endpoint {
 	return endpoint(fmt.Sprintf("api/%s", e))
 }
 
-func (e endpoint) String() string {
-	return string(e)
-}
 
 

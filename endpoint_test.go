@@ -11,7 +11,7 @@ func TestEndpointAction(t *testing.T) {
 		action string
 		want endpoint
 	}{
-		{endpoint("test"), list, "api/test/listar"},
+		{endpoint("test"), read, "api/test/listar"},
 		{endpoint("test"), create, "api/test/cadastrar"},
 	}
 
@@ -58,7 +58,7 @@ func TestEndpointString(t *testing.T) {
 		want string
 	}{
 		{
-			endpoint("test").Action(list).Query(url.Values{"filter": []string{"123"}}),
+			endpoint("test").Action(read).Query(url.Values{"filter": []string{"123"}}),
 			"api/test/listar?filter=123",
 		},
 	}
