@@ -8,35 +8,35 @@ import (
 	"testing"
 )
 
-func TestUnity(t *testing.T) {
+func TestCollaborator(t *testing.T) {
 	testCases := []testTable{
 		{
 			"Read()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&UnityService{req}).Read(ctx, Filter{"id": "123"})
+				resp, err = (&CollaboratorService{req}).Read(ctx, Filter{"name": "test"})
 				return
 			},
 			context.Background(),
 			http.MethodGet,
-			unityEndpoint.Action(read).Query(url.Values{"idUnidade": []string{"123"}}),
+			collaboratorEndpoint.Action(read).Query(url.Values{"nome": []string{"test"}}),
 			nil,
-			&UnityResponse{
+			&CollaboratorResponse{
 				DefaultResponse: DefaultResponse{Success: true},
-				Response: []*Unity{
-					&Unity{ID:123},
+				Response: []*Collaborator{
+					&Collaborator{ID:123},
 				},
 			},
 		},
 		{
 			"Create()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&UnityService{req}).Create(ctx, &Unity{Code: "123"})
+				resp, err = (&CollaboratorService{req}).Create(ctx, &Collaborator{Name: "123"})
 				return
 			},
 			context.Background(),
 			http.MethodPost,
-			unityEndpoint.Action(create),
-			&Unity{Code: "123"},
+			collaboratorEndpoint.Action(create),
+			&Collaborator{Name: "123"},
 			&DefaultResponse{
 				Success: true,
 			},
@@ -44,13 +44,13 @@ func TestUnity(t *testing.T) {
 		{
 			"Update()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&UnityService{req}).Update(ctx, &Unity{Code: "123"})
+				resp, err = (&CollaboratorService{req}).Update(ctx, &Collaborator{Company: 1})
 				return
 			},
 			context.Background(),
 			http.MethodPost,
-			unityEndpoint.Action(update),
-			&Unity{Code: "123"},
+			collaboratorEndpoint.Action(update),
+			&Collaborator{Company: 1},
 			&DefaultResponse{
 				Success: true,
 			},
@@ -58,13 +58,13 @@ func TestUnity(t *testing.T) {
 		{
 			"Inactivate()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&UnityService{req}).Inactivate(ctx, 1)
+				resp, err = (&CollaboratorService{req}).Inactivate(ctx, 1)
 				return
 			},
 			context.Background(),
 			http.MethodPost,
-			unityEndpoint.Action(inactivate).Query(url.Values{"idUnidade": []string{"1"}}),
-			nil,
+			collaboratorEndpoint.Action(inactivate),
+			&Collaborator{ID: 1},
 			&DefaultResponse{
 				Success: true,
 			},
@@ -76,12 +76,12 @@ func TestUnity(t *testing.T) {
 	}
 }
 
-func TestUnityError(t *testing.T) {
+func TestCollaboratorError(t *testing.T) {
 	testCases := []testTableError{
 		{
 			"Read()",
 			func(req requester) error {
-				_, err := (&UnityService{req}).Read(context.Background(), nil)
+				_, err := (&CollaboratorService{req}).Read(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),
@@ -89,7 +89,7 @@ func TestUnityError(t *testing.T) {
 		{
 			"Create()",
 			func(req requester) error {
-				_, err := (&UnityService{req}).Create(context.Background(), nil)
+				_, err := (&CollaboratorService{req}).Create(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),
@@ -97,7 +97,7 @@ func TestUnityError(t *testing.T) {
 		{
 			"Update()",
 			func(req requester) error {
-				_, err := (&UnityService{req}).Update(context.Background(), nil)
+				_, err := (&CollaboratorService{req}).Update(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),
@@ -105,7 +105,7 @@ func TestUnityError(t *testing.T) {
 		{
 			"Inactivate()",
 			func(req requester) error {
-				_, err := (&UnityService{req}).Inactivate(context.Background(), 1)
+				_, err := (&CollaboratorService{req}).Inactivate(context.Background(), 1)
 				return err
 			},
 			errors.New("Error"),

@@ -4,9 +4,15 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 const unityEndpoint endpoint = `unidade`
+
+var unityFields = map[string]string{
+	"id": "idUnidade",
+	"code": "codDescricao",
+}
 
 // Unity is the  struct representing the unity
 // entity in the API.
@@ -43,13 +49,10 @@ type UnityService struct {
 }
 
 // Read returns the UnityResponse for the passed filters.
-func (us *UnityService) Read(ctx context.Context, id, desc string) (*UnityResponse, error) {
+func (us *UnityService) Read(ctx context.Context, f Filter) (*UnityResponse, error) {
 	ur := &UnityResponse{}
-	vals := url.Values{}
-	vals.Set("idUnidade", id)
-	vals.Set("codDescricao", desc)
 
-	if err := us.client.Request(ctx, http.MethodGet, unityEndpoint.Action(read).Query(vals), nil, ur); err != nil {
+	if err := us.client.Request(ctx, http.MethodGet, unityEndpoint.Action(read).Query(f.Values(unityFields)), nil, ur); err != nil {
 		return nil, err
 	}
 
@@ -79,10 +82,11 @@ func (us *UnityService) Update(ctx context.Context, u *Unity) (*DefaultResponse,
 }
 
 // Inactivate inactivates the unity in the API.
-func (us *UnityService) Inactivate(ctx context.Context, id string) (*DefaultResponse, error) {
+func (us *UnityService) Inactivate(ctx context.Context, id int) (*DefaultResponse, error) {
 	res := &DefaultResponse{}
 	vals := url.Values{}
-	vals.Set("idUnidade", id)
+	// Converts to string in order to keep the pattern of receiving integer in the Inactivate method.
+	vals.Set("idUnidade", strconv.Itoa(id))
 
 	if err := us.client.Request(ctx, http.MethodPost, unityEndpoint.Action(inactivate).Query(vals), nil, res); err != nil {
 		return nil, err

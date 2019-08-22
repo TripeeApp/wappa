@@ -16,6 +16,20 @@ const (
 	errFmt = `Error while request the LigueTaxi API: %s; Status Code: %d; Body: %s.`
 )
 
+// Filter is used to filter the requests to the API.
+type Filter map[string]string
+
+// Values returns a url.Values mapped between Filter and values.
+func (f Filter) Values(fields map[string]string) url.Values {
+	vals := url.Values{}
+	for k, v := range f {
+		if q, ok := fields[k]; ok {
+			vals.Set(q, v)
+		}
+	}
+	return vals
+}
+
 // ResponseError contains the default error porperties
 // returnes by the API.
 type ResponseError struct {

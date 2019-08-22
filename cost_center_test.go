@@ -13,12 +13,12 @@ func TestCostCenter(t *testing.T) {
 		{
 			"Read()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&CostCenterService{req}).Read(ctx, "123", "test")
+				resp, err = (&CostCenterService{req}).Read(ctx, Filter{"code": "45"})
 				return
 			},
 			context.Background(),
 			http.MethodGet,
-			costCenterEndpoint.Action(read).Query(url.Values{"idCentroCusto": []string{"123"}, "codDescricao": []string{"test"}}),
+			costCenterEndpoint.Action(read).Query(url.Values{"codDescricao": []string{"45"}}),
 			nil,
 			&CostCenterResponse{
 				DefaultResponse: DefaultResponse{Success: true},
@@ -81,7 +81,7 @@ func TestCostCenterError(t *testing.T) {
 		{
 			"Read()",
 			func(req requester) error {
-				_, err := (&CostCenterService{req}).Read(context.Background(), "123", "test")
+				_, err := (&CostCenterService{req}).Read(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),

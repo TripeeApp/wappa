@@ -3,10 +3,14 @@ package wappa
 import (
 	"context"
 	"net/http"
-	"net/url"
 )
 
 const costCenterEndpoint endpoint = `centrocusto`
+
+var costCenterFields = map[string]string{
+	"id": "idCentroCusto",
+	"code": "codDescricao",
+}
 
 // CostCenter is the  struct representing the cost center
 // entity in the API.
@@ -14,9 +18,9 @@ type CostCenter struct {
 	ID			int `json:"IdCentroCusto,omtempty"`
 	Name			string `json:"Nome,omitempty"`
 	Code			string `json:"Codigo,omitempty"`
-	HigherCostCenterID	string `json:"IdCentroCustoSuperior,omitempty"`
-	HigherCostCenterCode	string `json:"CodigoCCSuperior,omitempty"`
-	HigherCostCenterName	string `json:"NomeCCSuperior,omitempty"`
+	ParentCostCenterID	string `json:"IdCentroCustoSuperior,omitempty"`
+	ParentCostCenterCode	string `json:"CodigoCCSuperior,omitempty"`
+	ParentCostCenterName	string `json:"NomeCCSuperior,omitempty"`
 	CNPJ			string `json:"CNJPEmpresaGrupo,omitempty"`
 }
 
@@ -34,13 +38,10 @@ type CostCenterService struct {
 }
 
 // Read returns the CostCenterResponse for the passed filters.
-func (cs *CostCenterService) Read(ctx context.Context, id, desc string) (*CostCenterResponse, error) {
+func (cs *CostCenterService) Read(ctx context.Context, f Filter) (*CostCenterResponse, error) {
 	cr := &CostCenterResponse{}
-	vals := url.Values{}
-	vals.Set("idCentroCusto", id)
-	vals.Set("codDescricao", desc)
 
-	if err := cs.client.Request(ctx, http.MethodGet, costCenterEndpoint.Action(read).Query(vals), nil, cr); err != nil {
+	if err := cs.client.Request(ctx, http.MethodGet, costCenterEndpoint.Action(read).Query(f.Values(costCenterFields)), nil, cr); err != nil {
 		return nil, err
 	}
 

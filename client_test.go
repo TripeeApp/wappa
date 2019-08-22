@@ -97,6 +97,29 @@ func testError(tc testTableError) func(t *testing.T) {
 	}
 }
 
+var testingMap = map[string]string{"id": "idTest"}
+
+func TestFilter(t *testing.T) {
+	testCases := []struct{
+		filter Filter
+		want url.Values
+	}{
+		{
+			Filter{"id": "123"},
+			url.Values{
+				"idTest": []string{"123"},
+			},
+		},
+
+	}
+
+	for _, tc := range testCases {
+		if got := tc.filter.Values(testingMap); !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("got from Filter.Values(%+v): %+v; want %+v.", tc.filter, got, tc.want)
+		}
+	}
+}
+
 func TestNew(t *testing.T) {
 	testCases := []struct{
 		host	*url.URL

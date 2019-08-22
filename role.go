@@ -3,10 +3,14 @@ package wappa
 import (
 	"context"
 	"net/http"
-	"net/url"
 )
 
 const roleEndpoint endpoint = `cargo`
+
+var roleFields = map[string]string{
+	"id": "idCargo",
+	"desc": "descricao",
+}
 
 // Role is the  struct representing the role
 // entity in the API.
@@ -30,13 +34,10 @@ type RoleService struct {
 }
 
 // Read returns the RoleResponse for the passed filters.
-func (rs *RoleService) Read(ctx context.Context, id, desc string) (*RoleResponse, error) {
+func (rs *RoleService) Read(ctx context.Context, f Filter) (*RoleResponse, error) {
 	r := &RoleResponse{}
-	vals := url.Values{}
-	vals.Set("idCargo", id)
-	vals.Set("descricao", desc)
 
-	if err := rs.client.Request(ctx, http.MethodGet, roleEndpoint.Action(read).Query(vals), nil, r); err != nil {
+	if err := rs.client.Request(ctx, http.MethodGet, roleEndpoint.Action(read).Query(f.Values(roleFields)), nil, r); err != nil {
 		return nil, err
 	}
 

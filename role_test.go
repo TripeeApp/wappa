@@ -13,12 +13,12 @@ func TestRole(t *testing.T) {
 		{
 			"Read()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&RoleService{req}).Read(ctx, "123", "test")
+				resp, err = (&RoleService{req}).Read(ctx, Filter{"id": "1"})
 				return
 			},
 			context.Background(),
 			http.MethodGet,
-			roleEndpoint.Action(read).Query(url.Values{"idCargo": []string{"123"}, "descricao": []string{"test"}}),
+			roleEndpoint.Action(read).Query(url.Values{"idCargo": []string{"1"}}),
 			nil,
 			&RoleResponse{
 				DefaultResponse: DefaultResponse{Success: true},
@@ -53,7 +53,7 @@ func TestRoleError(t *testing.T) {
 		{
 			"Read()",
 			func(req requester) error {
-				_, err := (&RoleService{req}).Read(context.Background(), "123", "test")
+				_, err := (&RoleService{req}).Read(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),
