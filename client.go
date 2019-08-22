@@ -72,6 +72,12 @@ type Client struct {
 	// Host used for API requets.
 	// host should always be specified with a trailing slash.
 	host *url.URL
+
+	// Services implemented
+	Collaborator *CollaboratorService
+	CostCenter *CostCenterService
+	Role *RoleService
+	Unity *UnityService
 }
 
 // Client returns a new Wappa API client with provided host URL and HTTP client.
@@ -79,7 +85,13 @@ func New(host *url.URL, client *http.Client) *Client {
 	if client == nil {
 		client = &http.Client{}
 	}
-	return &Client{client, host}
+	c := &Client{client: client, host: host}
+	c.Collaborator = &CollaboratorService{c}
+	c.CostCenter = &CostCenterService{c}
+	c.Role = &RoleService{c}
+	c.Unity = &UnityService{c}
+
+	return c
 }
 
 // Request created an API request. A relative path can be providaded

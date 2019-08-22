@@ -138,8 +138,24 @@ func TestNew(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(c.client, tc.wantClient) {
-			t.Errorf("got Client %+v; want %+v.", c.client, tc.wantClient)
+			t.Errorf("got client %+v; want %+v.", c.client, tc.wantClient)
 		}
+
+		if c.Collaborator == nil {
+			t.Errorf("got CollaboratorService == nil; want not nil.")
+		}
+		if c.CostCenter == nil {
+			t.Errorf("got CostCenterService == nil; want not nil.")
+		}
+
+		if c.Role == nil {
+			t.Errorf("got RoleService == nil; want not nil.")
+		}
+
+		if c.Unity == nil {
+			t.Errorf("got UnityService == nil; want not nil.")
+		}
+
 	}
 }
 
