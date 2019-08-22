@@ -17,7 +17,7 @@ type CostCenter struct {
 	HigherCostCenterID	string `json:"IdCentroCustoSuperior,omitempty"`
 	HigherCostCenterCode	string `json:"CodigoCCSuperior,omitempty"`
 	HigherCostCenterName	string `json:"NomeCCSuperior,omitempty"`
-	EIN			string `json:"CNJPEmpresaGrupo,omitempty"`
+	CNPJ			string `json:"CNJPEmpresaGrupo,omitempty"`
 }
 
 // CostCenterResponse is the API response payload.
