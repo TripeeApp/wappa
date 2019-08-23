@@ -3,6 +3,8 @@ package wappa
 import (
 	"bytes"
 	"context"
+	_"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -120,6 +122,27 @@ func TestFilter(t *testing.T) {
 	}
 }
 
+func TestOperationDefaultResponseParser(t *testing.T) {
+	testCases := []struct{
+		input io.Reader
+		want *OperationDefaultResponse
+	}{
+		{strings.NewReader(`{"Success":true}`), &OperationDefaultResponse{DefaultResponse{Success: true}}},
+		{strings.NewReader(`Alterada com sucesso.`), &OperationDefaultResponse{DefaultResponse{Success: true, Response: "Alterada com sucesso."}}},
+	}
+
+	for _, tc := range testCases {
+		d := &OperationDefaultResponse{}
+		if err := d.Parse(tc.input); err != nil {
+			t.Fatalf("got error while calling DefaultResponse.Parse(%+v): %s; want nil.", tc.input, err.Error())
+		}
+
+		if !reflect.DeepEqual(d, tc.want) {
+			t.Errorf("got DefaultResponse: %+v; want %+v", d, tc.want)
+		}
+	}
+}
+
 func TestNew(t *testing.T) {
 	testCases := []struct{
 		host	*url.URL
@@ -163,9 +186,7 @@ func newMockServer(handler func(w http.ResponseWriter, r *http.Request)) *httpte
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
-type dummy struct {
-	Name string `json:"name"`
-}
+type dummy struct { Name string `json:"name"` }
 
 func TestClientRequest(t *testing.T) {
 	emptyObj := []byte(`{}`)
@@ -175,19 +196,21 @@ func TestClientRequest(t *testing.T) {
 		method	 string
 		body	 interface{}
 		server	 *httptest.Server
+		output   interface{}
 		wantOut	 interface{}
 	}{
 		{
 			"",
 			http.MethodGet,
-			nil,
+			&DefaultResponse{},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodGet {
 					t.Errorf("go Request.Method %s; want %s.", r.Method, http.MethodGet)
 				}
 				w.Write(emptyObj)
 			}),
-			dummy{},
+			&DefaultResponse{},
+			&DefaultResponse{},
 		},
 		{
 			"foo",
@@ -199,19 +222,21 @@ func TestClientRequest(t *testing.T) {
 				}
 				w.Write(emptyObj)
 			}),
-			dummy{},
+			&DefaultResponse{},
+			&DefaultResponse{},
 		},
 		{
 			"foo",
 			http.MethodPost,
-			nil,
+			&DefaultResponse{},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if c := r.Header.Get("Content-Type"); c != "application/json" {
 					t.Errorf("got 'Content-Type' Header: '%s'; want 'application/json'.", c)
 				}
 				w.Write(emptyObj)
 			}),
-			dummy{},
+			&DefaultResponse{},
+			&DefaultResponse{},
 		},
 		{
 			"",
@@ -223,12 +248,13 @@ func TestClientRequest(t *testing.T) {
 				}
 				w.Write(emptyObj)
 			}),
-			dummy{},
+			&DefaultResponse{},
+			&DefaultResponse{},
 		},
 		{
 			"",
 			http.MethodPost,
-			dummy{"Testing"},
+			&DefaultResponse{Success: true},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if r.Body == http.NoBody {
 					t.Error("got Request.Body empty, want not empty.")
@@ -236,22 +262,33 @@ func TestClientRequest(t *testing.T) {
 
 				got, _ := ioutil.ReadAll(r.Body)
 
-				if want := []byte(`{"name":"Testing"}`); !bytes.Contains(got, want) {
+				if want := []byte(`"Success":true`); !bytes.Contains(got, want) {
 					t.Errorf("got body: %s, want %s.", got, want)
 				}
+				w.Write([]byte(`{"Success":true}`))
+			}),
+			&DefaultResponse{},
+			&DefaultResponse{Success: true},
+		},
+		{
+			"",
+			http.MethodPost,
+			nil,
+			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte(`{"name":"Testing"}`))
 			}),
-			dummy{"Testing"},
+			&dummy{},
+			&dummy{Name: "Testing"},
 		},
 	}
 
 	for _, tc := range testCases {
-		var output dummy
+		output := tc.output
 
 		u, _ := url.Parse(tc.server.URL)
 		c := New(u, nil)
 
-		err := c.Request(context.Background(), tc.method, tc.endpoint, tc.body, &output)
+		err := c.Request(context.Background(), tc.method, tc.endpoint, tc.body, output)
 		if err != nil {
 			t.Fatalf("got error calling Client.Request(context.Background(), %s, %s, %+v, %+v): %s; want nil.",
 				tc.method, tc.endpoint, tc.body, output, err.Error())
@@ -318,10 +355,6 @@ func TestClientRequestError(t *testing.T) {
 				if err != nil {
 					if wantStatus := http.StatusInternalServerError; err.statusCode != wantStatus {
 						t.Errorf("got Error.statusCode: %d; want %d.", err.statusCode, wantStatus)
-					}
-
-					if wantBody := []byte(http.StatusText(http.StatusInternalServerError)); !bytes.Equal(wantBody, err.body) {
-						t.Errorf("got Error.body: %s; want %s.", err.body, wantBody)
 					}
 
 					if wantSubStr := "invalid character 'I'"; !strings.Contains(err.msg, wantSubStr) {
