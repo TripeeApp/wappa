@@ -3,7 +3,8 @@ package wappa
 import (
 	"context"
 	"net/http"
-	"time"
+	"net/url"
+	"strconv"
 )
 
 const collaboratorEndpoint endpoint = `colaborador`
@@ -47,13 +48,13 @@ type Collaborator struct {
 	CostCenterName           string  `json:"NomeCentroCusto,omitempty"`
 	UnityCode                string  `json:"CodigoUnidade,omitempty"`
 	UnityName                string  `json:"NomeUnidade,omitempty"`
-	ChangedStatusAt          *time.Time  `json:"DataStatus,omitempty"`
-	CreatedAt                *time.Time  `json:"DataCadastro,omitempty"`
-	ActivatedAt              *time.Time  `json:"DataAtivacao,omitempty"`
-	ReactivatedAt            *time.Time  `json:"DataReativacao,omitempty"`
-	InactivatedAt            *time.Time  `json:"DataDesativacao,omitempty"`
-	BlockedAt                *time.Time  `json:"DataBloqueio,omitempty"`
-	PasswordResentAt         *time.Time  `json:"DataReenvioSenha,omitempty"`
+	ChangedStatusAt          Time  `json:"DataStatus,omitempty"`
+	CreatedAt                Time  `json:"DataCadastro,omitempty"`
+	ActivatedAt              Time  `json:"DataAtivacao,omitempty"`
+	ReactivatedAt            Time  `json:"DataReativacao,omitempty"`
+	InactivatedAt            Time  `json:"DataDesativacao,omitempty"`
+	BlockedAt                Time  `json:"DataBloqueio,omitempty"`
+	PasswordResentAt         Time  `json:"DataReenvioSenha,omitempty"`
 	Type                     int     `json:"TipoColaborador,omitempty"`
 	Foreign                  bool    `json:"Estrangeiro,omitempty"`
 	CardExpiration           string  `json:"ValidadeCartao,omitempty"`
@@ -119,9 +120,12 @@ func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*Op
 // Inactivate inactivates the collaborator in the API.
 func (cs *CollaboratorService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
 	res := &OperationDefaultResponse{}
+	// Converts to string in order to keep the pattern of receiving integer in the Inactivate method.
+	vals := url.Values{}
+	vals.Set("idColaborador", strconv.Itoa(id))
 
 	c := &Collaborator{ID: id}
-	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(inactivate), c, res); err != nil {
+	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(inactivate).Query(vals), c, res); err != nil {
 		return nil, err
 	}
 
