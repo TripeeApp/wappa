@@ -43,6 +43,11 @@ type DefaultResponse struct {
 	Success bool
 	Quantity int `json:"quantidade"`
 	Error ResponseError
+	// Returned by the API when error occurs
+	Message string
+	MessageDetail string
+	// Response of Create, Update and Activate/Inactivate-family operations.
+	Response string
 }
 
 // requester is the interface that performs a request
@@ -86,6 +91,8 @@ func New(host *url.URL, client *http.Client) *Client {
 		client = &http.Client{}
 	}
 	c := &Client{client: client, host: host}
+
+	// Sets services.
 	c.Collaborator = &CollaboratorService{c}
 	c.CostCenter = &CostCenterService{c}
 	c.Role = &RoleService{c}
