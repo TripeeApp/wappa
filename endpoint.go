@@ -10,7 +10,7 @@ import(
 const (
 	read		= `listar`
 	create		= `cadastrar`
-	update		= `alterar`
+	update		= `editar`
 	activate	= `ativar`
 	inactivate	= `inativar`
 )
