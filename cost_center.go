@@ -60,8 +60,8 @@ func (cs *CostCenterService) Create(ctx context.Context, cc *CostCenter) (*Defau
 }
 
 // Updated edits the cost center information.
-func (cs *CostCenterService) Update(ctx context.Context, cc *CostCenter) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
+func (cs *CostCenterService) Update(ctx context.Context, cc *CostCenter) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 
 	if err := cs.client.Request(ctx, http.MethodPost, costCenterEndpoint.Action(update), cc, res); err != nil {
 		return nil, err
@@ -71,8 +71,8 @@ func (cs *CostCenterService) Update(ctx context.Context, cc *CostCenter) (*Defau
 }
 
 // Inactivate inactivates the cost center in the API.
-func (cs *CostCenterService) Inactivate(ctx context.Context, id int) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
+func (cs *CostCenterService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 	cc := &CostCenter{ID: id}
 
 	if err := cs.client.Request(ctx, http.MethodPost, costCenterEndpoint.Action(inactivate), cc, res); err != nil {

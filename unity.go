@@ -17,8 +17,8 @@ var unityFields = map[string]string{
 // Unity is the  struct representing the unity
 // entity in the API.
 type Unity struct {
-	ID		int `json:"IdUniddade,omtempty"`
-	Customer	int `json:"IdEmpresaCliente,omitempty"`
+	ID		int `json:"IdUnidade,omtempty"`
+	CustomerCompany	int `json:"IdEmpresaCliente,omitempty"`
 	Code		string `json:"Codigo,omitempty"`
 	Name		string `json:"Nome,omitempty"`
 	Address		string `json:"Endereco,omitempty"`
@@ -71,8 +71,8 @@ func (us *UnityService) Create(ctx context.Context, u *Unity) (*DefaultResponse,
 }
 
 // Updated edits the unity information.
-func (us *UnityService) Update(ctx context.Context, u *Unity) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
+func (us *UnityService) Update(ctx context.Context, u *Unity) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 
 	if err := us.client.Request(ctx, http.MethodPost, unityEndpoint.Action(update), u, res); err != nil {
 		return nil, err
@@ -82,10 +82,10 @@ func (us *UnityService) Update(ctx context.Context, u *Unity) (*DefaultResponse,
 }
 
 // Inactivate inactivates the unity in the API.
-func (us *UnityService) Inactivate(ctx context.Context, id int) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
-	vals := url.Values{}
+func (us *UnityService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 	// Converts to string in order to keep the pattern of receiving integer in the Inactivate method.
+	vals := url.Values{}
 	vals.Set("idUnidade", strconv.Itoa(id))
 
 	if err := us.client.Request(ctx, http.MethodPost, unityEndpoint.Action(inactivate).Query(vals), nil, res); err != nil {

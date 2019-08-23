@@ -51,8 +51,8 @@ func TestCostCenter(t *testing.T) {
 			http.MethodPost,
 			costCenterEndpoint.Action(update),
 			&CostCenter{ID: 123},
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 		{
@@ -65,8 +65,8 @@ func TestCostCenter(t *testing.T) {
 			http.MethodPost,
 			costCenterEndpoint.Action(inactivate),
 			&CostCenter{ID: 123},
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 	}

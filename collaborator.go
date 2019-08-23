@@ -106,8 +106,8 @@ func (cs *CollaboratorService) Create(ctx context.Context, c *Collaborator) (*De
 }
 
 // Updated edits the collaborator information.
-func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
+func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 
 	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(update), c, res); err != nil {
 		return nil, err
@@ -117,8 +117,8 @@ func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*De
 }
 
 // Inactivate inactivates the collaborator in the API.
-func (cs *CollaboratorService) Inactivate(ctx context.Context, id int) (*DefaultResponse, error) {
-	res := &DefaultResponse{}
+func (cs *CollaboratorService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
 
 	c := &Collaborator{ID: id}
 	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(inactivate), c, res); err != nil {

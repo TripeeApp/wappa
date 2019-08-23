@@ -51,8 +51,8 @@ func TestCollaborator(t *testing.T) {
 			http.MethodPost,
 			collaboratorEndpoint.Action(update),
 			&Collaborator{Company: 1},
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 		{
@@ -65,8 +65,8 @@ func TestCollaborator(t *testing.T) {
 			http.MethodPost,
 			collaboratorEndpoint.Action(inactivate),
 			&Collaborator{ID: 1},
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 	}

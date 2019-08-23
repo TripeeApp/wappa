@@ -51,8 +51,8 @@ func TestUnity(t *testing.T) {
 			http.MethodPost,
 			unityEndpoint.Action(update),
 			&Unity{Code: "123"},
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 		{
@@ -65,8 +65,8 @@ func TestUnity(t *testing.T) {
 			http.MethodPost,
 			unityEndpoint.Action(inactivate).Query(url.Values{"idUnidade": []string{"1"}}),
 			nil,
-			&DefaultResponse{
-				Success: true,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
 			},
 		},
 	}
