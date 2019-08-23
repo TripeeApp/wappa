@@ -18,10 +18,10 @@ type CostCenter struct {
 	ID			int `json:"IdCentroCusto,omtempty"`
 	Name			string `json:"Nome,omitempty"`
 	Code			string `json:"Codigo,omitempty"`
-	ParentCostCenterID	string `json:"IdCentroCustoSuperior,omitempty"`
+	ParentCostCenterID	int `json:"IdCentroCustoSuperior,omitempty"`
 	ParentCostCenterCode	string `json:"CodigoCCSuperior,omitempty"`
 	ParentCostCenterName	string `json:"NomeCCSuperior,omitempty"`
-	CNPJ			string `json:"CNJPEmpresaGrupo,omitempty"`
+	CNPJ			string `json:"CNPJEmpresaGrupo,omitempty"`
 }
 
 // CostCenterResponse is the API response payload.
