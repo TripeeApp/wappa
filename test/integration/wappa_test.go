@@ -141,11 +141,12 @@ func checkOperation(delay time.Duration, retries int, check func() error ) (succ
 }
 
 func loggingHTTPClient() *http.Client {
-	var hc *http.Client
-	if *logging {
-		hc = &http.Client{
-			Transport: &transportLogger{http.DefaultTransport},
-		}
+	if !*logging {
+		return http.DefaultClient
+	}
+
+	hc := &http.Client{
+		Transport: &transportLogger{http.DefaultTransport},
 	}
 
 	return hc
