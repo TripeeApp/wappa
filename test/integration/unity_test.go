@@ -2,8 +2,6 @@ package integration
 
 import(
 	"context"
-	"fmt"
-	"strconv"
 	"testing"
 
 	"bitbucket.org/mobilitee/wappa"
@@ -61,9 +59,4 @@ func TestUnity(t *testing.T) {
 	if !opres.Success {
 		t.Fatalf("got error while inactivating an unity: %s; want nil.", opres.Message)
 	}
-
-	f = wappa.Filter{"id": strconv.Itoa(unity.ID)}
-	u, err = wpp.Unity.Read(context.Background(), f)
-
-	fmt.Printf("%+v\n", u)
 }
