@@ -16,7 +16,7 @@ var roleFields = map[string]string{
 // entity in the API.
 type Role struct {
 	ID		int `json:"IdCargo,omtempty"`
-	Description	int `json:"Descricao,omitempty"`
+	Description	string `json:"Descricao,omitempty"`
 	Filter		string `json:"Filtro,omitempty"`
 }
 
