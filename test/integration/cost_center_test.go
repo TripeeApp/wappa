@@ -11,7 +11,7 @@ func TestCostCenter(t *testing.T) {
 	code := randString(5, letterBytes)
 	res, err := wpp.CostCenter.Create(context.Background(), &wappa.CostCenter{Name: "test", Code: code, CNPJ: "27906045000186"})
 	if err != nil {
-		t.Fatalf("got error while calling CostCenter.Read(): %s; want nil.", err.Error())
+		t.Fatalf("got error while calling CostCenter.Create(): %s; want nil.", err.Error())
 	}
 
 	if !res.Success {

@@ -11,7 +11,7 @@ func TestUnity(t *testing.T) {
 	code := randString(5, numberBytes)
 	res, err := wpp.Unity.Create(context.Background(), &wappa.Unity{CustomerCompany: 123, Code: code})
 	if err != nil {
-		t.Fatalf("got error while calling Unity.Read(): %s; want nil.", err.Error())
+		t.Fatalf("got error while calling Unity.Create(): %s; want nil.", err.Error())
 	}
 
 	if !res.Success {
