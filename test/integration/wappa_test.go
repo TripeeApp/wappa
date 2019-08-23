@@ -4,6 +4,7 @@ import (
 	"context"
 	"bytes"
 	"flag"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/url"
@@ -17,30 +18,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Transport used to log the requests.
-type transportLogger struct {
-	base http.RoundTripper
-}
-
-func (t *transportLogger) RoundTrip(r *http.Request) (*http.Response, error) {
-	reqBody, _ := ioutil.ReadAll(r.Body)
-	r.Body.Close()
-
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-
-	res, err := t.base.RoundTrip(r)
-	if err != nil {
-		return nil, err
-	}
-
-	resBody, _ := ioutil.ReadAll(res.Body)
-	log.Printf("Request /%s %s %s --> Response %s %s",
-		r.Method, r.URL.String(), string(reqBody), res.Status, string(resBody))
-
-	res.Body = ioutil.NopCloser(bytes.NewBuffer(resBody))
-
-	return res, nil
-}
 
 const (
 	envKeyWappaHost = "WAPPA_HOST"
@@ -57,28 +34,79 @@ const (
 	letterIdxMax = 63 / letterIdxBits
 )
 
+var auth bool
+
 // Ligue Taxi Client
-var wappa *wappa.Client
+var wpp *wappa.Client
 
 var src = rand.NewSource(time.Now().UnixNano())
 
 var logging = flag.Bool("log", false, "Define if tests should log the requests")
 
+// Transport used to log the requests.
+type transportLogger struct {
+	base http.RoundTripper
+}
+
+func (t *transportLogger) RoundTrip(req *http.Request) (*http.Response, error) {
+	var (
+		reqBody []byte
+		err error
+	)
+
+	if req.Body != nil {
+		reqBody, err = ioutil.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+		req.Body.Close()
+
+		req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	}
+
+	res, err := t.base.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resBody, _ := ioutil.ReadAll(res.Body)
+
+	log.Println("Request")
+	log.Println("Headers:")
+	for k, v := range req.Header {
+		log.Printf("%s: %s\n", k, v)
+	}
+	log.Printf("/%s %s %s --> Response %s %s",
+		req.Method, req.URL.String(), string(reqBody), res.Status, string(resBody))
+
+	res.Body = ioutil.NopCloser(bytes.NewBuffer(resBody))
+
+	return res, nil
+}
+
 func init() {
 	flag.Parse()
 
-	token := os.Getenv("WAPPA_AUTH_TOKEN")
-	if token == "" {
-		panic("No auth token defined!!")
+	host, err := url.Parse(os.Getenv(envKeyWappaHost))
+	if err != nil {
+		panic(err.Error())
 	}
 
-	host, _ := url.Parse(os.Getenv(envKeyWappaHost))
+	token := os.Getenv("WAPPA_AUTH_TOKEN")
+	if token == "" {
+		fmt.Println("No auth token. Some tests may not run!")
+		wpp = wappa.New(host, nil)
+	} else {
+		host, _ := url.Parse(os.Getenv(envKeyWappaHost))
 
-	tc := oauth2.NewClient(loggingContext, &oauth2.StaticTokenSource(
-		&oauth2.Token{accessToken: token},
-	))
+		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
+		tc := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		))
+		wpp = wappa.New(host, tc)
 
-	wappa = wappa.New(host, tc)
+		auth = true
+	}
 }
 
 func randString(max int, rangeBytes string) string {
@@ -112,14 +140,20 @@ func checkOperation(delay time.Duration, retries int, check func() error ) (succ
 	return success, err
 }
 
-func loggingContext() context.Context {
-	ctx := context.Background()
+func loggingHTTPClient() *http.Client {
+	var hc *http.Client
 	if *logging {
-		hc := &http.Client{
-			Transport: &transportLogger{http.DefaultTransport}
+		hc = &http.Client{
+			Transport: &transportLogger{http.DefaultTransport},
 		}
-		ctx = ctx.WithValue(context.Background(), oauth2.HTTPClient, hc)
 	}
 
-	return ctx
+	return hc
+}
+
+func checkAuth(name string) bool {
+	if !auth {
+		fmt.Printf("Skipping test %s for no authorization token was set.", name)
+	}
+	return auth
 }
