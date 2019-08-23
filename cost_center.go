@@ -48,7 +48,7 @@ func (cs *CostCenterService) Read(ctx context.Context, f Filter) (*CostCenterRes
 	return cr, nil
 }
 
-// Create creates a unity resource in the API.
+// Create creates a cost center resource in the API.
 func (cs *CostCenterService) Create(ctx context.Context, cc *CostCenter) (*DefaultResponse, error) {
 	res := &DefaultResponse{}
 
