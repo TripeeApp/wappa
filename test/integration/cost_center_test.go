@@ -25,7 +25,7 @@ func TestCostCenter(t *testing.T) {
 	}
 
 	if !c.Success {
-		t.Fatalf("got error while reading a cost center: %s; want nil.", res.Message)
+		t.Fatalf("got error while reading a cost center: %s; want nil.", c.Message)
 	}
 
 	costCenter := c.Response[0]
