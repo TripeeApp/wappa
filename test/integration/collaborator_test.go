@@ -8,10 +8,6 @@ import(
 	"bitbucket.org/mobilitee/wappa"
 )
 
-// Unidade - 
-// cargo - (paygrade_level) - campo da tabela employee
-// 
-
 func TestCollaborator(t *testing.T) {
 	enrollment := randString(5, numberBytes)
 	res, err := wpp.Collaborator.Create(context.Background(), &wappa.Collaborator{
@@ -62,9 +58,18 @@ func TestCollaborator(t *testing.T) {
 		t.Fatalf("got error while reading a collaborator: %s; want nil.", res.Message)
 	}
 
+	opres, err = wpp.Collaborator.Activate(context.Background(), collaborator.ID)
+	if err != nil {
+		t.Fatalf("got error while calling Collaborator.Activate(%d): %s; want nil.", collaborator.ID, err.Error())
+	}
+
+	if !opres.Success {
+		t.Fatalf("got error while activating a collaborator: %s; want nil.", opres.Message)
+	}
+
 	opres, err = wpp.Collaborator.Inactivate(context.Background(), collaborator.ID)
 	if err != nil {
-		t.Fatalf("got error while calling Collaborator.Inactivate(%+v): %s; want nil.", f, err.Error())
+		t.Fatalf("got error while calling Collaborator.Inactivate(%d): %s; want nil.", collaborator.ID, err.Error())
 	}
 
 	if !opres.Success {
