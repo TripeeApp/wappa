@@ -117,17 +117,36 @@ func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*Op
 	return res, nil
 }
 
-// Inactivate inactivates the collaborator in the API.
-func (cs *CollaboratorService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
+// Activate inactivates the collaborator in the API.
+func (cs *CollaboratorService) Activate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
 	res := &OperationDefaultResponse{}
-	// Converts to string in order to keep the pattern of receiving integer in the Inactivate method.
-	vals := url.Values{}
-	vals.Set("idColaborador", strconv.Itoa(id))
 
-	c := &Collaborator{ID: id}
-	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(inactivate).Query(vals), c, res); err != nil {
+	if err := cs.updateStatus(ctx, id, activate, res); err != nil {
 		return nil, err
 	}
 
 	return res, nil
+}
+
+// Inactivate inactivates the collaborator in the API.
+func (cs *CollaboratorService) Inactivate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
+	res := &OperationDefaultResponse{}
+
+	if err := cs.updateStatus(ctx, id, inactivate, res); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (cs *CollaboratorService) updateStatus(ctx context.Context, id int, action string, output interface{}) error {
+	// Converts to string in order to keep the pattern of receiving integer in the activate method.
+	vals := url.Values{}
+	vals.Set("idColaborador", strconv.Itoa(id))
+
+	if err := cs.client.Request(ctx, http.MethodPost, collaboratorEndpoint.Action(action).Query(vals), nil, output); err != nil {
+		return err
+	}
+
+	return nil
 }

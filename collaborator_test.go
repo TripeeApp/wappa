@@ -56,6 +56,20 @@ func TestCollaborator(t *testing.T) {
 			},
 		},
 		{
+			"Activate()",
+			func(ctx context.Context, req requester) (resp interface{}, err error) {
+				resp, err = (&CollaboratorService{req}).Activate(ctx, 1)
+				return
+			},
+			context.Background(),
+			http.MethodPost,
+			collaboratorEndpoint.Action(activate).Query(url.Values{"idColaborador": []string{"1"}}),
+			nil,
+			&OperationDefaultResponse{
+				DefaultResponse{Success: true},
+			},
+		},
+		{
 			"Inactivate()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
 				resp, err = (&CollaboratorService{req}).Inactivate(ctx, 1)
@@ -63,8 +77,8 @@ func TestCollaborator(t *testing.T) {
 			},
 			context.Background(),
 			http.MethodPost,
-			collaboratorEndpoint.Action(inactivate),
-			&Collaborator{ID: 1},
+			collaboratorEndpoint.Action(inactivate).Query(url.Values{"idColaborador": []string{"1"}}),
+			nil,
 			&OperationDefaultResponse{
 				DefaultResponse{Success: true},
 			},
@@ -98,6 +112,14 @@ func TestCollaboratorError(t *testing.T) {
 			"Update()",
 			func(req requester) error {
 				_, err := (&CollaboratorService{req}).Update(context.Background(), nil)
+				return err
+			},
+			errors.New("Error"),
+		},
+		{
+			"Activate()",
+			func(req requester) error {
+				_, err := (&CollaboratorService{req}).Activate(context.Background(), 1)
 				return err
 			},
 			errors.New("Error"),
