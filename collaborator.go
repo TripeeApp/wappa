@@ -117,7 +117,7 @@ func (cs *CollaboratorService) Update(ctx context.Context, c *Collaborator) (*Op
 	return res, nil
 }
 
-// Activate inactivates the collaborator in the API.
+// Activate activates the collaborator in the API.
 func (cs *CollaboratorService) Activate(ctx context.Context, id int) (*OperationDefaultResponse, error) {
 	res := &OperationDefaultResponse{}
 
