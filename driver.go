@@ -14,20 +14,20 @@ var driverFields = map[string]string{
 	"employee": "EmployeeId",
 }
 
-// Driver is the  struct representing the driver
+// DriverLocation is the  struct representing the driver location
 // entity in the API.
-type Driver struct {
-	Long float64 `json:"longitude"`
-	Lat float64 `json:"latitude"`
-	Bearing int `json:"bearing"`
-	Type int `json:"typeId"`
+type DriverLocation struct {
+	Location
+
+	Bearing int `json:"bearing,omitempty"`
+	Type int `json:"typeId,omitempty"`
 }
 
 // DriverResult is the API response payload.
 type DriverResult struct {
 	Result
 
-	Drivers []*Driver `json:"listenners"`
+	Drivers []*DriverLocation `json:"listenners"`
 }
 
 // DriverService is responsible for handling
@@ -36,11 +36,11 @@ type DriverService struct {
 	client requester
 }
 
-// NearBy returns the driver of a given type that are closest to the given coordinates.
-func (ds *DriverService) NearBy(ctx context.Context, f Filter) (*DriverResult, error) {
+// Nearby returns the driver of a given type that are closest to the given coordinates.
+func (ds *DriverService) Nearby(ctx context.Context, f Filter) (*DriverResult, error) {
 	d := &DriverResult{}
 
-	if err := ds.client.Request(ctx, http.MethodGet, driverEndpoint.Action(nearBy).Query(f.Values(driverFields)), nil, d); err != nil {
+	if err := ds.client.Request(ctx, http.MethodGet, driverEndpoint.Action(nearby).Query(f.Values(driverFields)), nil, d); err != nil {
 		return nil, err
 	}
 

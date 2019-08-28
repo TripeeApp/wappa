@@ -11,19 +11,19 @@ import (
 func TestDriver(t *testing.T) {
 	testCases := []testTable{
 		{
-			"NearBy()",
+			"Nearby()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
-				resp, err = (&DriverService{req}).NearBy(ctx, Filter{"lat": []string{"3.14"}})
+				resp, err = (&DriverService{req}).Nearby(ctx, Filter{"lat": []string{"3.14"}})
 				return
 			},
 			context.Background(),
 			http.MethodGet,
-			driverEndpoint.Action(nearBy).Query(url.Values{"Latitude": []string{"3.14"}}),
+			driverEndpoint.Action(nearby).Query(url.Values{"Latitude": []string{"3.14"}}),
 			nil,
 			&DriverResult{
 				Result: Result{Success: true},
-				Drivers: []*Driver{
-					&Driver{Lat: 3.14},
+				Drivers: []*DriverLocation{
+					&DriverLocation{Location: Location{Lat: 3.14}},
 				},
 			},
 		},
@@ -37,9 +37,9 @@ func TestDriver(t *testing.T) {
 func TestDriverError(t *testing.T) {
 	testCases := []testTableError{
 		{
-			"NearBy()",
+			"Nearby()",
 			func(req requester) error {
-				_, err := (&DriverService{req}).NearBy(context.Background(), nil)
+				_, err := (&DriverService{req}).Nearby(context.Background(), nil)
 				return err
 			},
 			errors.New("Error"),
