@@ -3,8 +3,6 @@ package wappa
 import (
 	"bytes"
 	"context"
-	_"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -107,38 +105,16 @@ func TestFilter(t *testing.T) {
 		want url.Values
 	}{
 		{
-			Filter{"id": "123"},
+			Filter{"id": []string{"123"}},
 			url.Values{
 				"idTest": []string{"123"},
 			},
 		},
-
 	}
 
 	for _, tc := range testCases {
 		if got := tc.filter.Values(testingMap); !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("got from Filter.Values(%+v): %+v; want %+v.", tc.filter, got, tc.want)
-		}
-	}
-}
-
-func TestOperationDefaultResponseParser(t *testing.T) {
-	testCases := []struct{
-		input io.Reader
-		want *OperationDefaultResponse
-	}{
-		{strings.NewReader(`{"Success":true}`), &OperationDefaultResponse{DefaultResponse{Success: true}}},
-		{strings.NewReader(`Alterada com sucesso.`), &OperationDefaultResponse{DefaultResponse{Success: true, Response: "Alterada com sucesso."}}},
-	}
-
-	for _, tc := range testCases {
-		d := &OperationDefaultResponse{}
-		if err := d.Parse(tc.input); err != nil {
-			t.Fatalf("got error while calling DefaultResponse.Parse(%+v): %s; want nil.", tc.input, err.Error())
-		}
-
-		if !reflect.DeepEqual(d, tc.want) {
-			t.Errorf("got DefaultResponse: %+v; want %+v", d, tc.want)
 		}
 	}
 }
@@ -164,19 +140,12 @@ func TestNew(t *testing.T) {
 			t.Errorf("got client %+v; want %+v.", c.client, tc.wantClient)
 		}
 
-		if c.Collaborator == nil {
-			t.Errorf("got CollaboratorService == nil; want not nil.")
-		}
-		if c.CostCenter == nil {
-			t.Errorf("got CostCenterService == nil; want not nil.")
+		if c.Webhook == nil {
+			t.Errorf("got WebhookService == nil; want not nil.")
 		}
 
-		if c.Role == nil {
-			t.Errorf("got RoleService == nil; want not nil.")
-		}
-
-		if c.Unity == nil {
-			t.Errorf("got UnityService == nil; want not nil.")
+		if c.Driver == nil {
+			t.Errorf("got Driver == nil; want not nil.")
 		}
 
 	}
@@ -202,41 +171,41 @@ func TestClientRequest(t *testing.T) {
 		{
 			"",
 			http.MethodGet,
-			&DefaultResponse{},
+			&Result{},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodGet {
 					t.Errorf("go Request.Method %s; want %s.", r.Method, http.MethodGet)
 				}
 				w.Write(emptyObj)
 			}),
-			&DefaultResponse{},
-			&DefaultResponse{},
+			&Result{},
+			&Result{},
 		},
 		{
 			"foo",
 			http.MethodGet,
 			nil,
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
-				if want := "/foo"; r.URL.Path != want {
+				if want := "/api/foo"; r.URL.Path != want {
 					t.Errorf("got Request.URL: %s; want %s.", r.URL.Path, want)
 				}
 				w.Write(emptyObj)
 			}),
-			&DefaultResponse{},
-			&DefaultResponse{},
+			&Result{},
+			&Result{},
 		},
 		{
 			"foo",
 			http.MethodPost,
-			&DefaultResponse{},
+			&Result{},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if c := r.Header.Get("Content-Type"); c != "application/json" {
 					t.Errorf("got 'Content-Type' Header: '%s'; want 'application/json'.", c)
 				}
 				w.Write(emptyObj)
 			}),
-			&DefaultResponse{},
-			&DefaultResponse{},
+			&Result{},
+			&Result{},
 		},
 		{
 			"",
@@ -248,13 +217,13 @@ func TestClientRequest(t *testing.T) {
 				}
 				w.Write(emptyObj)
 			}),
-			&DefaultResponse{},
-			&DefaultResponse{},
+			&Result{},
+			&Result{},
 		},
 		{
 			"",
 			http.MethodPost,
-			&DefaultResponse{Success: true},
+			&Result{Success: true},
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
 				if r.Body == http.NoBody {
 					t.Error("got Request.Body empty, want not empty.")
@@ -267,8 +236,8 @@ func TestClientRequest(t *testing.T) {
 				}
 				w.Write([]byte(`{"Success":true}`))
 			}),
-			&DefaultResponse{},
-			&DefaultResponse{Success: true},
+			&Result{},
+			&Result{Success: true},
 		},
 		{
 			"",

@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 // perser is the interface that performs the parsing of the body request.
@@ -23,14 +22,16 @@ type requester interface{
 }
 
 // Filter is used to filter the requests to the API.
-type Filter map[string]string
+type Filter map[string][]string
 
 // Values returns a url.Values mapped between Filter and values.
 func (f Filter) Values(fields map[string]string) url.Values {
 	vals := url.Values{}
-	for k, v := range f {
+	for k, filters := range f {
 		if q, ok := fields[k]; ok {
-			vals.Set(q, v)
+			for _, v := range filters {
+				vals.Add(q, v)
+			}
 		}
 	}
 	return vals
@@ -43,39 +44,13 @@ type ResponseError struct{
 	Message int
 }
 
-// DefaultResponse contains the basics porperties
+// Result contains the base porperties
 // all requests to the Wappa API returns.
-type DefaultResponse struct{
+type Result struct{
 	Success bool
-	Quantity int `json:"Quantidade,omitempty"`
 	Error ResponseError
 	// Returned by the API when error occurs
 	Message string
-	MessageDetail string
-	// Response of Create, Update and Activate/Inactivate-family operations.
-	Response string
-}
-
-type OperationDefaultResponse struct {
-	DefaultResponse
-}
-
-// Parse implements the Parser interface for reading the request body.
-func (d *OperationDefaultResponse) Parse(body io.Reader) error {
-	// TODO: add tests for error on reading body
-	b, _ := ioutil.ReadAll(body)
-
-	if err := json.Unmarshal(b, d); err != nil {
-		if msg := string(b); strings.Contains(msg, "com sucesso") {
-			d.Success = true
-			d.Response = msg
-			return nil
-		}
-
-		return fmt.Errorf(`Error parsing body: '%s'; message: '%s'.`, b, err.Error())
-	}
-
-	return nil
 }
 
 // ApiError implements the error interface
@@ -100,10 +75,8 @@ type Client struct{
 	host *url.URL
 
 	// Services implemented
-	Collaborator *CollaboratorService
-	CostCenter *CostCenterService
-	Role *RoleService
-	Unity *UnityService
+	Webhook *WebhookService
+	Driver *DriverService
 }
 
 // Client returns a new Wappa API client with provided host URL and HTTP client.
@@ -114,10 +87,8 @@ func New(host *url.URL, client *http.Client) *Client {
 	c := &Client{client: client, host: host}
 
 	// Sets services.
-	c.Collaborator = &CollaboratorService{c}
-	c.CostCenter = &CostCenterService{c}
-	c.Role = &RoleService{c}
-	c.Unity = &UnityService{c}
+	c.Webhook = &WebhookService{c}
+	c.Driver = &DriverService{c}
 
 	return c
 }
