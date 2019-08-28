@@ -8,7 +8,7 @@ import(
 
 // Actions
 const (
-	nearBy			= `nearby`
+	nearby			= `nearby`
 	status			= `status`
 	lastRide		= `last-rides`
 	cancellationReason	= `ativar`
