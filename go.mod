@@ -1,4 +1,4 @@
-module bitbucket.org/mobilitee/wappa
+module github.com/rdleal/wappa
 
 go 1.12
 
