@@ -29,7 +29,7 @@ type testTableError struct {
 	err	error
 }
 
-type testRequester struct{
+type testRequester struct {
 	body	interface{}
 	ctx	context.Context
 	err	error
@@ -148,6 +148,13 @@ func TestNew(t *testing.T) {
 			t.Errorf("got Driver == nil; want not nil.")
 		}
 
+		if c.Ride == nil {
+			t.Errorf("got Ride == nil; want not nil.")
+		}
+
+		if c.Employee == nil {
+			t.Errorf("got Employee == nil; want not nil.")
+		}
 	}
 }
 

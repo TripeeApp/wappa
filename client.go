@@ -75,8 +75,10 @@ type Client struct{
 	host *url.URL
 
 	// Services implemented
-	Webhook *WebhookService
 	Driver *DriverService
+	Employee *EmployeeService
+	Ride *RideService
+	Webhook *WebhookService
 }
 
 // Client returns a new Wappa API client with provided host URL and HTTP client.
@@ -89,6 +91,8 @@ func New(host *url.URL, client *http.Client) *Client {
 	// Sets services.
 	c.Webhook = &WebhookService{c}
 	c.Driver = &DriverService{c}
+	c.Ride = &RideService{c}
+	c.Employee = &EmployeeService{c}
 
 	return c
 }

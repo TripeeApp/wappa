@@ -10,8 +10,9 @@ import(
 const (
 	nearby			= `nearby`
 	status			= `status`
-	lastRide		= `last-rides`
-	cancellationReason	= `ativar`
+	lastRides		= `last-rides`
+	cancellationReason	= `cancellation-reason`
+	employee		= `employee`
 	cancel			= `cancel`
 	rate			= `rate`
 	update			= `update`
@@ -40,4 +41,3 @@ func (e endpoint) String() string {
 	}
 	return s
 }
-
