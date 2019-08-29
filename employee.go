@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 const employeeEndpoint endpoint = `employee`
@@ -15,8 +16,8 @@ const indexEndpoint endpoint = `index`
 var employeeLastRidesFields = map[string]string{
 	"ride": "RideId",
 	"employee" : "EmployeeId",
-	"startDate": "InitialDate",
-	"endDate": "FinalDate",
+	"startedAt": "InitialDate",
+	"endedAt": "FinalDate",
 	"externalID": "ExternalID",
 }
 
@@ -50,7 +51,54 @@ type EmployeeStatusResult struct {
 	Status string `json:"status"`
 }
 
+// Base represents a generic type for describing
+// a resource with an ID an Description attributes.
+type Base struct {
+	ID int `json:"id"`
+	Description string `json:"description"`
+}
+
+type HistoricalCategory struct {
+	Base
+
+	Type Base `json:"type"`
+	SubCategory Base `json:"subcategory"`
+}
+
+type HistoricalDriver struct {
+	Driver
+
+	Category HistoricalCategory `json:"category"`
+	Photo string `json:"photo"`
+}
+
+// RideHistory represents the historical information of a ride.
 type RideHistory struct {
+	ID int `json:"rideId"`
+	CompanyID int `json:"companyId"`
+	Passenger Passenger `json:"passenger"`
+	Origin Address `json:"origin"`
+	Destiny Address `json:"destiny"`
+	Driver HistoricalDriver `json:"driver"`
+	Info HistoricalRideInfo  `json:"rideInfo"`
+}
+
+// HistoricalRideInfo represents a historical information
+// about a ride made by the employee
+type HistoricalRideInfo struct {
+	Status string `json:"status"`
+	StartedAt *time.Time `json:"rideDate"`
+	EndedAt *time.Time `json:"finishDate"`
+	PaidAt *time.Time `json:"paymentDate"`
+	MapURL string `json:"rideMapURL"`
+	CancelledBy string `json:"cancelledBy"`
+	CancelledReason string `json:"cancelledReason"`
+	Value float64 `json:"rideValue"`
+	OriginalValue float64 `json:"rideOriginalValue"`
+	DIscount float64 `json:"rideDiscount"`
+	ExternalID int `json:"externalId"`
+	DurationInSeconds int `json:"durationInSeconds"`
+	Distance int `json:"distance"`
 }
 
 // EmployeeLastRidesResult represents the up to 100 last employee last rides.
