@@ -100,11 +100,21 @@ type RideResult struct {
 	Driver Driver `json:"driver"`
 }
 
+// CancellationReasonResult represents the response of listing 
+// the cancellation reason of rides.
+type CancellationReasonResult struct {
+	Reasons []Base `json:"reasons"`
+}
+
+// rideCancel contains the ride ID and reason ID.
+// pulled off for testing.
 type rideCancel struct {
 	ID int `json:"rideId"`
 	Reason int `json:"reasonId"`
 }
 
+// rideRate contains the ride ID and rating number.
+// pulled off for testing.  
 type rideRate struct {
 	ID int `json:"rideId"`
 	Rating int `json:"rating"`
@@ -137,6 +147,17 @@ func (rs *RideService) Create(ctx context.Context, r *Ride) (*RideResult, error)
 	}
 
 	return res, nil
+}
+
+// CancellationReason returns the list of possible reasons a user can choose when cancelling a ride.
+func (rs *RideService) CancellationReason(ctx context.Context) (*CancellationReasonResult, error) {
+	r := &CancellationReasonResult{}
+
+	if err := rs.client.Request(ctx, http.MethodGet, indexEndpoint.Action(cancellationReason), nil, r); err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }
 
 //Cancel cancels a ride request.

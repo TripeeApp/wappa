@@ -41,6 +41,22 @@ func TestRide(t *testing.T) {
 			},
 		},
 		{
+			"CancellationReason()",
+			func(ctx context.Context, req requester) (resp interface{}, err error) {
+				resp, err = (&RideService{req}).CancellationReason(ctx)
+				return
+			},
+			context.Background(),
+			http.MethodGet,
+			indexEndpoint.Action(cancellationReason),
+			nil,
+			&CancellationReasonResult{
+				Reasons: []Base{
+					Base{1, "Test"},
+				},
+			},
+		},
+		{
 			"Cancel()",
 			func(ctx context.Context, req requester) (resp interface{}, err error) {
 				resp, err = (&RideService{req}).Cancel(ctx, 1, 2)
