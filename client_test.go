@@ -125,7 +125,7 @@ func TestNew(t *testing.T) {
 		client	*http.Client
 		wantClient *http.Client
 	}{
-		{&url.URL{}, nil, &http.Client{}},
+		{&url.URL{}, nil, http.DefaultClient},
 		{&url.URL{}, &http.Client{}, &http.Client{}},
 	}
 
@@ -378,6 +378,101 @@ func TestClientRequestWithContext(t *testing.T) {
 	c := New(u, nil)
 
 	if err := c.Request(ctx, http.MethodGet, "/", nil, nil); err == nil {
+		t.Errorf("got error nil; want not nil")
+	}
+}
+
+func TestClientStatus(t *testing.T) {
+
+	testCases := []struct{
+		server	 *httptest.Server
+		wantOK	 bool
+	}{
+		{
+			newMockServer(func(w http.ResponseWriter, r *http.Request) {
+				if want := "/api/status"; r.URL.Path != want {
+					t.Errorf("got Request.URL: %s; want %s.", r.URL.Path, want)
+				}
+				w.WriteHeader(http.StatusOK)
+			}),
+			true,
+		},
+		{
+			newMockServer(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodGet {
+					t.Errorf("go Request.Method %s; want %s.", r.Method, http.MethodGet)
+				}
+				w.WriteHeader(http.StatusOK)
+			}),
+			true,
+		},
+		{
+			newMockServer(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusInternalServerError)
+			}),
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		u, _ := url.Parse(tc.server.URL)
+		c := New(u, nil)
+
+		ok, err := c.Status(context.Background())
+		if err != nil {
+			t.Fatalf("got error calling Client.Status(context.Background()): %s; want nil.", err.Error())
+		}
+
+		if ok != tc.wantOK{
+			t.Errorf("got output from Client.Status(): %+v; want %+v.", ok, tc.wantOK)
+		}
+
+		tc.server.Close()
+	}
+}
+
+func TestClientStatusError(t *testing.T) {
+	testCases := []struct{
+		server		*httptest.Server
+	}{
+		{
+			httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})),
+		},
+	}
+
+	for _, tc := range testCases {
+		u, _ := url.Parse(tc.server.URL)
+		c := New(u, nil)
+
+		_, err := c.Status(context.Background())
+		if err == nil {
+			t.Errorf("got error nil; want not nil.")
+		}
+
+		tc.server.Close()
+	}
+}
+
+func TestClientStatusWithContext(t *testing.T) {
+	s := newMockServer(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		select {
+		case <-time.After(1 * time.Second):
+			t.Errorf("Expected request to be canceled by context")
+		case <-ctx.Done():
+			return
+		}
+	})
+	defer s.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	u, _ := url.Parse(s.URL)
+	c := New(u, nil)
+
+	if _, err := c.Status(ctx); err == nil {
 		t.Errorf("got error nil; want not nil")
 	}
 }

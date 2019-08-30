@@ -101,6 +101,39 @@ func TestRideError(t *testing.T) {
 			},
 			errors.New("Error"),
 		},
+		{
+			"Create()",
+			func(req requester) error {
+				_, err := (&RideService{req}).Create(context.Background(), nil)
+				return err
+			},
+			errors.New("Error"),
+		},
+		{
+			"CancellationReason()",
+			func(req requester) error {
+				_, err := (&RideService{req}).CancellationReason(context.Background())
+				return err
+			},
+			errors.New("Error"),
+		},
+		{
+			"Cancel()",
+			func(req requester) error {
+				_, err := (&RideService{req}).Cancel(context.Background(), 1, 1)
+				return err
+			},
+			errors.New("Error"),
+		},
+		{
+			"Rate()",
+			func(req requester) error {
+				_, err := (&RideService{req}).Rate(context.Background(), 1, 1)
+				return err
+			},
+			errors.New("Error"),
+		},
+
 	}
 
 	for _, tc := range testCases {

@@ -84,15 +84,15 @@ type Client struct{
 // Client returns a new Wappa API client with provided host URL and HTTP client.
 func New(host *url.URL, client *http.Client) *Client {
 	if client == nil {
-		client = &http.Client{}
+		client = http.DefaultClient
 	}
 	c := &Client{client: client, host: host}
 
 	// Sets services.
-	c.Webhook = &WebhookService{c}
 	c.Driver = &DriverService{c}
-	c.Ride = &RideService{c}
 	c.Employee = &EmployeeService{c}
+	c.Ride = &RideService{c}
+	c.Webhook = &WebhookService{c}
 
 	return c
 }
@@ -147,4 +147,31 @@ func (c *Client) Request(ctx context.Context, method string, path endpoint, body
 	}
 
 	return nil
+}
+
+// endpoint for checking the API status. Pulled off for teting.
+var statusEndpoint endpoint = `status`
+
+// Status returns the API status.
+func (c *Client) Status(ctx context.Context) (ok bool, err error){
+	u, err := c.host.Parse(statusEndpoint.String())
+	if err != nil {
+		return
+	}
+
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	if err != nil {
+		return
+	}
+
+	req = req.WithContext(ctx)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	ok = res.StatusCode == http.StatusOK
+
+	return
 }
