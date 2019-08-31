@@ -21,7 +21,7 @@ func TestWebhook(t *testing.T) {
 			nil,
 			&WebhookResult{
 				Result: Result{Success: true},
-				Listenners: []*Webhook{
+				Listeners: []*Webhook{
 					&Webhook{URL:"testing.url"},
 				},
 			},

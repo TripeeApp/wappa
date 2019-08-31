@@ -13,13 +13,14 @@ type Webhook struct {
 	URL string `json:"url"`
 	Endpoint string `json:"endpoint"`
 	AuthKey string `json:"authKey"`
+	Active bool `json:"active,omitempty"`
 }
 
 // WebhookResult is the API response payload.
 type WebhookResult struct {
 	Result
 
-	Listenners []*Webhook `json:"listenners"`
+	Listeners []*Webhook `json:"listeners"`
 }
 
 // WebhookService is responsible for handling
