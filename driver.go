@@ -9,7 +9,7 @@ const driverEndpoint endpoint = `driver`
 
 var driverFields = map[string]string{
 	"lat": "Latitude",
-	"long": "Longitude",
+	"lng": "Longitude",
 	"type": "TypeIds",
 	"employee": "EmployeeId",
 }
@@ -19,7 +19,7 @@ var driverFields = map[string]string{
 type DriverLocation struct {
 	Location
 
-	Bearing int `json:"bearing,omitempty"`
+	Bearing float64 `json:"bearing,omitempty"`
 	Type int `json:"typeId,omitempty"`
 }
 
@@ -27,14 +27,12 @@ type DriverLocation struct {
 type DriverResult struct {
 	Result
 
-	Drivers []*DriverLocation `json:"listenners"`
+	Drivers []*DriverLocation `json:"drivers"`
 }
 
 // DriverService is responsible for handling
 // the requests to the driver resource.
-type DriverService struct {
-	client requester
-}
+type DriverService service
 
 // Nearby returns the driver of a given type that are closest to the given coordinates.
 func (ds *DriverService) Nearby(ctx context.Context, f Filter) (*DriverResult, error) {

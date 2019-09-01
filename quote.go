@@ -9,13 +9,12 @@ import (
 const quoteEndpoint endpoint = `estimate`
 
 var quoteFields = map[string]string{
-	"placeOrigin": "placeIdOrigin",
-	"placeDestiny": "placeIdDestiny",
+	"placeOrigin": "PlaceIdOrigin",
+	"placeDestiny": "PlaceIdDestiny",
 	"latOrigin": "LatitudeOrigin",
-	"longOrigin": "LongitudeOrigin",
-	"latDest": "latitudeDestiny",
-	"longDest": "longetudeDestiny",
-	"type": "TypeIds",
+	"lngOrigin": "LongitudeOrigin",
+	"latDest": "LatitudeDestiny",
+	"lngDest": "LongitudeDestiny",
 	"employee": "EmployeeId",
 }
 
@@ -54,14 +53,12 @@ type Category struct {
 // DriverResult is the API response payload.
 type QuoteResult struct {
 	Categories []*Category  `json:"categories"`
-	EstimatedAt *time.Time`json:"date"`
+	EstimatedAt *time.Time `json:"date"`
 }
 
 // QuoteService is responsible for handling
 // the requests to the quote resource.
-type QuoteService struct {
-	client requester
-}
+type QuoteService service
 
 // Estimate returns a quote for a ride with the given parameters.
 func (qs *QuoteService) Estimate(ctx context.Context, f Filter) (*QuoteResult, error) {

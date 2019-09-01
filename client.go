@@ -11,10 +11,6 @@ import (
 	"net/url"
 )
 
-// perser is the interface that performs the parsing of the body request.
-type parser interface {
-	Parse(io.Reader) error
-}
 // requester is the interface that performs a request
 // to the server and delegates the persing to the parser interface. 
 type requester interface{
@@ -65,6 +61,10 @@ func (e *ApiError) Error() string {
 }
 
 
+type service struct {
+	client requester
+}
+
 // Client is responsible for handling requests to the Wappa API.
 type Client struct{
 	// client to comunicate with the API.
@@ -74,9 +74,13 @@ type Client struct{
 	// host should always be specified with a trailing slash.
 	host *url.URL
 
+	// reuse a single struct intead of allocation one for each service on the heap.
+	common service
+
 	// Services implemented
 	Driver *DriverService
 	Employee *EmployeeService
+	Quote *QuoteService
 	Ride *RideService
 	Webhook *WebhookService
 }
@@ -88,11 +92,13 @@ func New(host *url.URL, client *http.Client) *Client {
 	}
 	c := &Client{client: client, host: host}
 
+	c.common.client = c
 	// Sets services.
-	c.Driver = &DriverService{c}
-	c.Employee = &EmployeeService{c}
-	c.Ride = &RideService{c}
-	c.Webhook = &WebhookService{c}
+	c.Driver = (*DriverService)(&c.common)
+	c.Employee = (*EmployeeService)(&c.common)
+	c.Quote = (*QuoteService)(&c.common)
+	c.Ride = (*RideService)(&c.common)
+	c.Webhook = (*WebhookService)(&c.common)
 
 	return c
 }
@@ -127,22 +133,11 @@ func (c *Client) Request(ctx context.Context, method string, path endpoint, body
 	}
 	defer res.Body.Close()
 
-	// If the output is a parser, pass it the control over the body parsing.
-	if p, ok := output.(parser); ok {
-		if err := p.Parse(res.Body); err != nil {
-			return &ApiError{
-				statusCode: res.StatusCode,
-				msg:        err.Error(),
-			}
-		}
-	// Otherwise parses the body using the default API return type (JSON).
-	} else {
-		b, _ := ioutil.ReadAll(res.Body)
-		if err := json.Unmarshal(b, output); err != nil {
-			return &ApiError{
-				statusCode: res.StatusCode,
-				msg: fmt.Sprintf("Couldn't unmarshal body: '%s'. Message: '%s'.",  string(b), err.Error()),
-			}
+	bd, _ := ioutil.ReadAll(res.Body)
+	if err := json.Unmarshal(bd, output); err != nil {
+		return &ApiError{
+			statusCode: res.StatusCode,
+			msg: fmt.Sprintf("Couldn't unmarshal body: '%s'. Message: '%s'.",  string(bd), err.Error()),
 		}
 	}
 

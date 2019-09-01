@@ -7,6 +7,25 @@ import (
 
 const rideEndpoint endpoint = `ride`
 
+// Ride statuses.
+const (
+	RideStatusSearchingForDriver	= "searching-for-driver"
+	RideStatusDriverNotFound	= "driver-not-found"
+	RideStatusCancelled		= "ride-cancelled"
+	RideStatusDriverFound		= "driver-found"
+	RideStatusWaitingForDriver	= "waiting-for-driver"
+	RideStatusInProgress		= "on-ride"
+	RideStatusPaid			= "ride-paid"
+	RideStatusCompleted		= "ride-completed"
+)
+
+// Cancelled By
+const (
+	RideCancelledByUser   = "1"
+	RideCancelledByDriver = "2"
+	RideCancelledBySystem = "3"
+)
+
 var rideFields = map[string]string{
 	"id": "rideId",
 }
@@ -18,11 +37,11 @@ type Ride struct {
 	TaxiType int `json:"taxiTypeId"`
 	TaxiCategoryId int `json:"taxiCategoryID"`
 	LatOrigin float64 `json:"latitudeOrigin"`
-	LongOrigin float64 `json:"longitudeOrigin"`
+	LngOrigin float64 `json:"longitudeOrigin"`
 	LatDestiny float64 `json:"latitudeDestiny"`
-	LongDestiny float64 `json:"longitudeDestiny"`
-	OriginRef string `json:"originReference"`
-	ExternalID string `json:"externalID"`
+	LngDestiny float64 `json:"longitudeDestiny"`
+	OriginRef string `json:"originReference,omitempty"`
+	ExternalID string `json:"externalID,omitempty"`
 }
 
 type Passenger struct {
@@ -80,7 +99,7 @@ type RideInfo struct {
 	ToDestiny TravelInfo `json:"toDestiny"`
 	// The agent that canceled the ride. 
 	// Passenger = 1, Driver = 2, System = 3
-	CancalledBy string `json:"cancelledBy"`
+	CancelledBy string `json:"cancelledBy"`
 	// The reason that the ride was canceled for.
 	CancalledReason string `json:"cancelledReason"`
 	// The ride value, if available.
@@ -93,11 +112,12 @@ type RideInfo struct {
 type RideResult struct {
 	Result
 
-	RideID int `json:"rideID"`
+	ID int `json:"rideID"`
 	Passenger Passenger `json:"passenger"`
 	Origin Address `json:"origin"`
 	Destiny Address `json:"destiny"`
 	Driver Driver `json:"driver"`
+	Info RideInfo `json:"rideInfo"`
 }
 
 // CancellationReasonResult represents the response of listing 
@@ -123,15 +143,13 @@ type rideRate struct {
 
 // RideService is responsible for handling
 // the requests to the ride resource.
-type RideService struct {
-	client requester
-}
+type RideService service
 
 // Read returns the info of a ride.
 func (rs *RideService) Read(ctx context.Context, f Filter) (*RideResult, error) {
 	r := &RideResult{}
 
-	if err := rs.client.Request(ctx, http.MethodGet, rideEndpoint.Query(f.Values(rideFields)), nil, r); err != nil {
+	if err := rs.client.Request(ctx, http.MethodGet, rideEndpoint.Action(status).Query(f.Values(rideFields)), nil, r); err != nil {
 		return nil, err
 	}
 

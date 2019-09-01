@@ -25,9 +25,7 @@ type WebhookResult struct {
 
 // WebhookService is responsible for handling
 // the requests to the webhook resource.
-type WebhookService struct {
-	client requester
-}
+type WebhookService service
 
 // Read returns the webhooks created in the API.
 func (ws *WebhookService) Read(ctx context.Context) (*WebhookResult, error) {

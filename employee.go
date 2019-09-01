@@ -105,14 +105,12 @@ type HistoricalRideInfo struct {
 type EmployeeLastRidesResult struct {
 	Result
 
-	History []*RideHistory
+	History []*RideHistory `json:"history"`
 }
 
 // EmployeeService is responsible for handling
 // the requests to the webhook resource.
-type EmployeeService struct {
-	client requester
-}
+type EmployeeService service
 
 // Status returns the current status of employees in the API.
 func (es *EmployeeService) Status(ctx context.Context, id int) (*EmployeeStatusResult, error) {

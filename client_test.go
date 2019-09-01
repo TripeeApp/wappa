@@ -140,21 +140,26 @@ func TestNew(t *testing.T) {
 			t.Errorf("got client %+v; want %+v.", c.client, tc.wantClient)
 		}
 
-		if c.Webhook == nil {
-			t.Errorf("got WebhookService == nil; want not nil.")
-		}
-
 		if c.Driver == nil {
 			t.Errorf("got Driver == nil; want not nil.")
+		}
+
+		if c.Employee == nil {
+			t.Errorf("got Employee == nil; want not nil.")
+		}
+
+		if c.Quote == nil {
+			t.Errorf("got Quote == nil; want not nil.")
 		}
 
 		if c.Ride == nil {
 			t.Errorf("got Ride == nil; want not nil.")
 		}
 
-		if c.Employee == nil {
-			t.Errorf("got Employee == nil; want not nil.")
+		if c.Webhook == nil {
+			t.Errorf("got WebhookService == nil; want not nil.")
 		}
+
 	}
 }
 

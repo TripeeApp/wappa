@@ -18,11 +18,11 @@ func TestRide(t *testing.T) {
 			},
 			context.Background(),
 			http.MethodGet,
-			rideEndpoint.Query(url.Values{"rideId": []string{"1"}}),
+			rideEndpoint.Action(status).Query(url.Values{"rideId": []string{"1"}}),
 			nil,
 			&RideResult{
 				Result: Result{Success: true},
-				RideID: 1,
+				ID: 1,
 			},
 		},
 		{
@@ -37,7 +37,7 @@ func TestRide(t *testing.T) {
 			&Ride{LatOrigin: 3.14},
 			&RideResult{
 				Result: Result{Success: true},
-				RideID: 2,
+				ID: 2,
 			},
 		},
 		{
