@@ -2,14 +2,20 @@ package integration
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"testing"
+
+	"github.com/rdleal/wappa"
 )
 
 func TestEmployee(t *testing.T) {
-	r, err := wpp.Employee.Read(context.Background(), nil)
+	if !checkAuth("TestEmployee") {
+		return
+	}
+
+	r, err := wpp.Employee.Read(context.Background(), employeeFilter)
 	if err != nil {
-		t.Fatalf("got error while calling Employee.Read(): %s; want nil.", err.Error())
+		t.Fatalf("got error while calling Employee.Read(%+v): '%s'; want nil.", employeeFilter, err.Error())
 	}
 
 	if len(r.Employees) == 0 {
@@ -18,19 +24,17 @@ func TestEmployee(t *testing.T) {
 
 	employee := r.Employees[0]
 
-	status, err := wpp.Employee.Status(context.Background(), employee.ID)
+	_, err = wpp.Employee.Status(context.Background(), employee.ID)
 	if err != nil {
-		t.Errorf("got error while calling Employee.Status(%d): %s; want nil.", employee.ID, err.Error())
+		t.Errorf("got error while calling Employee.Status(%d): '%s'; want nil.", employee.ID, err.Error())
 	}
 
-	fmt.Printf("%+v\n", status)
-
-	res, err := wpp.Employee.LastRides(context.Background(), nil)
+	res, err := wpp.Employee.LastRides(context.Background(), wappa.Filter{"employee": []string{strconv.Itoa(employee.ID)}})
 	if err != nil {
-		t.Errorf("got error while calling Employee.LastRides(): %s; want nil.", err.Error())
+		t.Errorf("got error while calling Employee.LastRides(): '%s'; want nil.", err.Error())
 	}
 
 	if !res.Success {
-		t.Errorf("got failed response: '%s'; want it to be successful.", res.Message)
+		t.Errorf("got failed response while reading employee's last rides: '%s'; want it to be successful.", res.Message)
 	}
 }
