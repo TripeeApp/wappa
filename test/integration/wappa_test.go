@@ -1,7 +1,7 @@
 package integration
 
 import (
-	_"context"
+	"context"
 	"bytes"
 	"flag"
 	"fmt"
@@ -20,6 +20,8 @@ import (
 
 const (
 	envKeyWappaHost = "WAPPA_HOST"
+	envKeyWappaToken = "WAPPA_AUTH_TOKEN"
+	envKeyWappaEmployeeEmail = "WAPPA_EMPLOYEE_EMAIL"
 )
 
 const (
@@ -35,8 +37,24 @@ const (
 
 var auth bool
 
-// Ligue Taxi Client
+var employeeFilter wappa.Filter
+
+// Wappa Client
 var wpp *wappa.Client
+
+// TODO: Generate random lat and lng starting at the center of Sao Paulo
+// with destination within a certain radius and distance.
+// ref: http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
+var (
+	// Lat and Lng of Estacao Paraiso
+	latOrigin = -23.5719548
+	 lngOrigin = -46.647377
+
+	// Lat and Lng of Inferno Club
+	latDest = -23.5515681
+	lngDest = -46.6529553
+)
+
 
 var src = rand.NewSource(time.Now().UnixNano())
 
@@ -106,6 +124,20 @@ func (t *FixedTokenTransport) base() http.RoundTripper {
 	return http.DefaultClient.Transport
 }
 
+// cloneReq returns a clone of the *http.Request.
+// the clone is a shallow copy of the struct and its Header map.
+func cloneReq(r *http.Request) *http.Request {
+	// shalow copy of the struct
+	r2 := new(http.Request)
+	*r2 = *r
+	// deep copy the Header
+	r2.Header = make(http.Header, len(r.Header))
+	for k, s := range r.Header {
+		r2.Header[k] = append([]string(nil), s...)
+	}
+	return r2
+}
+
 func init() {
 	flag.Parse()
 
@@ -114,7 +146,7 @@ func init() {
 		panic(err.Error())
 	}
 
-	token := os.Getenv("WAPPA_AUTH_TOKEN")
+	token := os.Getenv(envKeyWappaToken)
 	if token == "" {
 		fmt.Println("No auth token. Some tests may not run!")
 		wpp = wappa.New(host, nil)
@@ -131,6 +163,10 @@ func init() {
 		wpp = wappa.New(host, hc)
 
 		auth = true
+	}
+
+	if email := os.Getenv(envKeyWappaEmployeeEmail); email != "" {
+		employeeFilter = wappa.Filter{"email": []string{email}}
 	}
 }
 
@@ -171,16 +207,19 @@ func checkAuth(name string) bool {
 	return auth
 }
 
-// cloneReq returns a clone of the *http.Request.
-// the clone is a shallow copy of the struct and its Header map.
-func cloneReq(r *http.Request) *http.Request {
-	// shalow copy of the struct
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy the Header
-	r2.Header = make(http.Header, len(r.Header))
-	for k, s := range r.Header {
-		r2.Header[k] = append([]string(nil), s...)
+func findEmployeeID(f wappa.Filter) (id int, ok bool) {
+	r, err := wpp.Employee.Read(context.Background(), f)
+	if err != nil {
+		fmt.Printf("got error while calling Employee.Read(%+v): '%s'; want nil.", f, err.Error())
+		return
 	}
-	return r2
+
+	if len(r.Employees) == 0 {
+		fmt.Printf("No Employee found. Skipping test...")
+	} else {
+		id = r.Employees[0].ID
+		ok = true
+	}
+
+	return
 }
