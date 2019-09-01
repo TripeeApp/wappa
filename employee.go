@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 const employeeEndpoint endpoint = `employee`
@@ -87,9 +86,9 @@ type RideHistory struct {
 // about a ride made by the employee
 type HistoricalRideInfo struct {
 	Status string `json:"status"`
-	StartedAt *time.Time `json:"rideDate"`
-	EndedAt *time.Time `json:"finishDate"`
-	PaidAt *time.Time `json:"paymentDate"`
+	StartedAt *Time `json:"rideDate"`
+	EndedAt *Time `json:"finishDate"`
+	PaidAt *Time `json:"paymentDate"`
 	MapURL string `json:"rideMapURL"`
 	CancelledBy string `json:"cancelledBy"`
 	CancelledReason string `json:"cancelledReason"`
