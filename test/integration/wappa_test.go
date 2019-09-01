@@ -15,6 +15,7 @@ import (
 	"unsafe"
 
 	"github.com/rdleal/wappa"
+	"golang.org/x/oauth2"
 )
 
 
@@ -101,43 +102,6 @@ func (t *transportLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-
-type FixedTokenTransport struct {
-	Token string
-
-	Base http.RoundTripper
-}
-
-func (t *FixedTokenTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	req := cloneReq(r)
-	// Injects the Authorization Header
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.Token))
-
-	return t.base().RoundTrip(req)
-}
-
-func (t *FixedTokenTransport) base() http.RoundTripper {
-	if t.Base != nil {
-		return t.Base
-	}
-
-	return http.DefaultClient.Transport
-}
-
-// cloneReq returns a clone of the *http.Request.
-// the clone is a shallow copy of the struct and its Header map.
-func cloneReq(r *http.Request) *http.Request {
-	// shalow copy of the struct
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy the Header
-	r2.Header = make(http.Header, len(r.Header))
-	for k, s := range r.Header {
-		r2.Header[k] = append([]string(nil), s...)
-	}
-	return r2
-}
-
 func init() {
 	flag.Parse()
 
@@ -153,13 +117,10 @@ func init() {
 	} else {
 		host, _ := url.Parse(os.Getenv(envKeyWappaHost))
 
-		//ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
-		hc := &http.Client{
-			Transport: &FixedTokenTransport{
-				Token: token,
-				Base: &transportLogger{http.DefaultTransport},
-			},
-		}
+		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
+		hc := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		))
 		wpp = wappa.New(host, hc)
 
 		auth = true
