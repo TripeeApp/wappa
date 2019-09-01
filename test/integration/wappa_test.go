@@ -14,7 +14,7 @@ import (
 	"time"
 	"unsafe"
 
-	"bitbucket.org/mobilitee/wappa"
+	"github.com/rdleal/wappa"
 	"golang.org/x/oauth2"
 )
 

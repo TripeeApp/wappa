@@ -5,7 +5,7 @@ import(
 	"fmt"
 	"testing"
 
-	"bitbucket.org/mobilitee/wappa"
+	"github.com/rdleal/wappa"
 )
 
 func TestCollaborator(t *testing.T) {

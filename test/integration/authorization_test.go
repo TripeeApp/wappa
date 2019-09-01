@@ -2,12 +2,11 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 	"net/url"
 
-	"bitbucket.org/mobilitee/wappa"
+	"github.com/rdleal/wappa"
 	"golang.org/x/oauth2"
 )
 
@@ -22,25 +21,14 @@ const(
 
 func TestAuthorization(t *testing.T) {
 	client := getOauthAppClient(t)
-	desc := randString(5, letterBytes)
 
-	res, err := client.Role.Create(context.Background(), &wappa.Role{ID: 1234, Description: desc})
+	role, err := client.Role.Read(context.Background(), nil)
 	if err != nil {
-		t.Fatalf("go error while calling Role.Read(nil): %s; want nil.", err.Error())
-	}
-
-	if !res.Success {
-		t.Errorf("go error while creating a role: %s; want nil.", err.Error())
-	}
-
-	f := wappa.Filter{"desc": desc}
-	role, err := client.Role.Read(context.Background(), f)
-	if err != nil {
-		t.Fatalf("go error while calling Role.Read(%+v): %s; want nil.",f, err.Error())
+		t.Fatalf("go error while calling Role.Read(): %s; want nil.", err.Error())
 	}
 
 	if !role.Success {
-		t.Errorf("got error while reading a role: %s; want nil.", res.Message)
+		t.Errorf("got error while reading a role: %s; want nil.", role.Message)
 	}
 }
 
@@ -67,25 +55,12 @@ func getOauthAppClient(t *testing.T) *wappa.Client {
 
 	host := os.Getenv(envKeyWappaHost)
 
-	conf := &oauth2.Config{
-		ClientID: clientID,
-		ClientSecret: clientSecret,
-		Endpoint: oauth2.Endpoint{
-			TokenURL: fmt.Sprintf("%stoken", host),
-			AuthStyle: oauth2.AuthStyleInParams,
-		},
-	}
-
-	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
-	tkn, err := conf.PasswordCredentialsToken(ctx, username, password)
-	if err != nil {
-		t.Fatalf("got error while calling oauth2.PasswordCredentialsToken(%s, %s): %s; want nil.", username, password, err.Error())
-	}
-
 	u, err := url.Parse(host)
 	if err != nil {
 		t.Fatalf("got error while calling url.Parse(%s): %s; want nil.", host, err.Error())
 	}
 
-	return wappa.New(u, conf.Client(ctx, tkn))
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
+
+	return wappa.New(u, oauth2.NewClient(ctx, wappa.NewTokenSource(ctx, host, clientID, clientSecret, username, password)))
 }

@@ -4,7 +4,7 @@ import(
 	"context"
 	"testing"
 
-	"bitbucket.org/mobilitee/wappa"
+	"github.com/rdleal/wappa"
 )
 
 func TestRole(t *testing.T) {
