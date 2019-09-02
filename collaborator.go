@@ -64,7 +64,7 @@ type Collaborator struct {
 	UnlimitedRides           bool    `json:"QtdCorridasIlimitado,omitempty"`
 	AnswerToID               int     `json:"IdRespondePara,omitempty"`
 	AnswerToName             string  `json:"NomeRespondePara,omitempty"`
-	AnwserToEnrollment       string  `json:"MatriculaRespondePara,omitempty"`
+	AnswerToEnrollment       string  `json:"MatriculaRespondePara,omitempty"`
 	AppVersion               string  `json:"VersaoApp,omitempty"`
 	UserID                   int     `json:"IdUsuario,omitempty"`
 	DDD                      string  `json:"Ddd,omitempty"`
