@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 )
 
 func TestQuote(t *testing.T) {
@@ -22,9 +22,9 @@ func TestQuote(t *testing.T) {
 	f := wappa.Filter{
 		"latOrigin": []string{fmt.Sprintf("%.7f", latOrigin)},
 		"lngOrigin": []string{fmt.Sprintf("%.7f", lngOrigin)},
-		"latDest": []string{fmt.Sprintf("%.7f", latDest)},
-		"lngDest": []string{fmt.Sprintf("%.7f", lngDest)},
-		"employee": []string{strconv.Itoa(empID)},
+		"latDest":   []string{fmt.Sprintf("%.7f", latDest)},
+		"lngDest":   []string{fmt.Sprintf("%.7f", lngDest)},
+		"employee":  []string{strconv.Itoa(empID)},
 	}
 
 	e, err := wpp.Quote.Estimate(context.Background(), f)

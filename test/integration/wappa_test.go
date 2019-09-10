@@ -1,27 +1,26 @@
 package integration
 
 import (
-	"context"
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
-	"net/url"
 	"net/http"
-	"io/ioutil"
+	"net/url"
 	"os"
 	"time"
 	"unsafe"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 	"golang.org/x/oauth2"
 )
 
-
 const (
-	envKeyWappaHost = "WAPPA_HOST"
-	envKeyWappaToken = "WAPPA_AUTH_TOKEN"
+	envKeyWappaHost          = "WAPPA_HOST"
+	envKeyWappaToken         = "WAPPA_AUTH_TOKEN"
 	envKeyWappaEmployeeEmail = "WAPPA_EMPLOYEE_EMAIL"
 )
 
@@ -33,7 +32,7 @@ const (
 const (
 	letterIdxBits = 6
 	letterIdxMask = 1<<letterIdxBits - 1
-	letterIdxMax = 63 / letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits
 )
 
 var auth bool
@@ -49,13 +48,12 @@ var wpp *wappa.Client
 var (
 	// Lat and Lng of Estacao Paraiso
 	latOrigin = -23.5719548
-	 lngOrigin = -46.647377
+	lngOrigin = -46.647377
 
 	// Lat and Lng of Inferno Club
 	latDest = -23.5515681
 	lngDest = -46.6529553
 )
-
 
 var src = rand.NewSource(time.Now().UnixNano())
 
@@ -69,7 +67,7 @@ type transportLogger struct {
 func (t *transportLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	var (
 		reqBody []byte
-		err error
+		err     error
 	)
 
 	if req.Body != nil {

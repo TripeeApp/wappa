@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 )
 
 func TestWebhook(t *testing.T) {
@@ -28,9 +28,9 @@ func TestWebhook(t *testing.T) {
 		curWebhook = r.Listeners[0]
 	} else {
 		curWebhook = &wappa.Webhook{
-			URL: "test.com",
+			URL:      "test.com",
 			Endpoint: "path/for/testing",
-			AuthKey: "auth-key",
+			AuthKey:  "auth-key",
 		}
 		res, err := wpp.Webhook.Create(context.Background(), curWebhook)
 		if err != nil {
@@ -59,7 +59,7 @@ func TestWebhook(t *testing.T) {
 	}
 
 	if !res.Success {
-		t.Errorf("got failed response while updating Webhooks (%+v): '%s'; want it to be successful.", curWebhook,  res.Message)
+		t.Errorf("got failed response while updating Webhooks (%+v): '%s'; want it to be successful.", curWebhook, res.Message)
 	}
 }
 

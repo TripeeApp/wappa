@@ -1,4 +1,4 @@
-module github.com/rdleal/wappa
+module github.com/mobilitee-smartmob/wappa
 
 go 1.12
 

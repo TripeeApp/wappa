@@ -2,10 +2,11 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"testing"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 )
 
 func TestRide(t *testing.T) {
@@ -17,6 +18,17 @@ func TestRide(t *testing.T) {
 	if !ok {
 		return
 	}
+
+	qr, err := wpp.Ride.QRCode(context.Background(), wappa.Filter{"employee": []string{strconv.Itoa(empID)}})
+	if err != nil {
+		t.Fatalf("got error while calling Ride.QRCode(): %s; want nil.", err.Error())
+	}
+
+	if !qr.Success {
+		t.Errorf("got failed response while creating QR code: '%s'; want it to be successful.", qr.Message)
+	}
+
+	fmt.Println(qr.QRCode)
 
 	r, err := wpp.Ride.CancellationReason(context.Background())
 	if err != nil {
@@ -30,14 +42,14 @@ func TestRide(t *testing.T) {
 	reason := r.Reasons[0].ID
 
 	ride := &wappa.Ride{
-		Employee: empID,
-		TaxiType: 1,
+		Employee:       empID,
+		TaxiType:       1,
 		TaxiCategoryId: 1,
-		LatOrigin: latOrigin,
-		LngOrigin: lngOrigin,
-		LatDestiny: latDest,
-		LngDestiny: lngDest,
-		ExternalID: randString(5, numberBytes),
+		LatOrigin:      latOrigin,
+		LngOrigin:      lngOrigin,
+		LatDestiny:     latDest,
+		LngDestiny:     lngDest,
+		ExternalID:     randString(5, numberBytes),
 	}
 
 	newRide, err := wpp.Ride.Create(context.Background(), ride)

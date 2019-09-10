@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 )
 
 func TestDriver(t *testing.T) {
@@ -20,9 +20,9 @@ func TestDriver(t *testing.T) {
 	}
 
 	f := wappa.Filter{
-		"lat": []string{fmt.Sprintf("%.7f", latOrigin)},
-		"lng": []string{fmt.Sprintf("%.7f", lngOrigin)},
-		"type": []string{"1"}, // TODO: Get from Env and defaults to 6 (Carro Particular)
+		"lat":      []string{fmt.Sprintf("%.7f", latOrigin)},
+		"lng":      []string{fmt.Sprintf("%.7f", lngOrigin)},
+		"type":     []string{"1"}, // TODO: Get from Env and defaults to 6 (Carro Particular)
 		"employee": []string{strconv.Itoa(empID)},
 	}
 

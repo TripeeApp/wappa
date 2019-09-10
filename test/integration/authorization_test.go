@@ -6,13 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rdleal/wappa"
+	"github.com/mobilitee-smartmob/wappa"
 	"golang.org/x/oauth2"
 )
 
 const msgEnvMissing = "Skipping test because the required environment variable (%v) is not present."
 
-const(
+const (
 	envKeyWappaUsername = "WAPPA_USERNAME"
 	envKeyWappaPassword = "WAPPA_PASSWORD"
 )
