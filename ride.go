@@ -9,14 +9,14 @@ const rideEndpoint endpoint = `ride`
 
 // Ride statuses.
 const (
-	RideStatusSearchingForDriver	= "searching-for-driver"
-	RideStatusDriverNotFound	= "driver-not-found"
-	RideStatusCancelled		= "ride-cancelled"
-	RideStatusDriverFound		= "driver-found"
-	RideStatusWaitingForDriver	= "waiting-for-driver"
-	RideStatusInProgress		= "on-ride"
-	RideStatusPaid			= "ride-paid"
-	RideStatusCompleted		= "ride-completed"
+	RideStatusSearchingForDriver = "searching-for-driver"
+	RideStatusDriverNotFound     = "driver-not-found"
+	RideStatusCancelled          = "ride-cancelled"
+	RideStatusDriverFound        = "driver-found"
+	RideStatusWaitingForDriver   = "waiting-for-driver"
+	RideStatusInProgress         = "on-ride"
+	RideStatusPaid               = "ride-paid"
+	RideStatusCompleted          = "ride-completed"
 )
 
 // Cancelled By
@@ -30,56 +30,60 @@ var rideFields = map[string]string{
 	"id": "rideId",
 }
 
+var qrCodeFields = map[string]string{
+	"employee": "EmployeeId",
+}
+
 // Ride is the  struct representing the ride
 // entity in the API.
 type Ride struct {
-	Employee int `json:"employeeId"`
-	TaxiType int `json:"taxiTypeId"`
-	TaxiCategoryId int `json:"taxiCategoryID"`
-	LatOrigin float64 `json:"latitudeOrigin"`
-	LngOrigin float64 `json:"longitudeOrigin"`
-	LatDestiny float64 `json:"latitudeDestiny"`
-	LngDestiny float64 `json:"longitudeDestiny"`
-	OriginRef string `json:"originReference,omitempty"`
-	ExternalID string `json:"externalID,omitempty"`
+	Employee       int     `json:"employeeId"`
+	TaxiType       int     `json:"taxiTypeId"`
+	TaxiCategoryId int     `json:"taxiCategoryID"`
+	LatOrigin      float64 `json:"latitudeOrigin"`
+	LngOrigin      float64 `json:"longitudeOrigin"`
+	LatDestiny     float64 `json:"latitudeDestiny"`
+	LngDestiny     float64 `json:"longitudeDestiny"`
+	OriginRef      string  `json:"originReference,omitempty"`
+	ExternalID     string  `json:"externalID,omitempty"`
 }
 
 type Passenger struct {
-	ID int `json:"employeeId"`
-	Name string `json:"name"`
-	DDD string `json:"ddd"`
+	ID    int    `json:"employeeId"`
+	Name  string `json:"name"`
+	DDD   string `json:"ddd"`
 	Phone string `json:"phone"`
 }
 
 type Location struct {
-	Lat float64 `json:"latitude"`
+	Lat  float64 `json:"latitude"`
 	Long float64 `json:"longitude"`
 }
 
 type Address struct {
-	City string `json:"city"`
-	State string `json:"state"`
-	Country string `json:"country"`
-	Address string `json:"address"`
+	City     string   `json:"city"`
+	State    string   `json:"state"`
+	Country  string   `json:"country"`
+	Address  string   `json:"address"`
 	Location Location `json:"location"`
 }
 
 type Vehicle struct {
 	Marker string `json:"marker"`
-	Model string `json:"model"`
-	Plate string `json:"plate"`
+	Model  string `json:"model"`
+	Plate  string `json:"plate"`
 }
 
 type Driver struct {
-	Name string `json:"name"`
-	DDD string `json:"ddd"`
-	Phone string `json:"phone"`
+	Name    string `json:"name"`
+	DDD     string `json:"ddd"`
+	Phone   string `json:"phone"`
 	Vehicle Vehicle
 }
 
 type TravelInfo struct {
-	Time string `json:"time"`
-	TimeSec string `json:"timeSec"`
+	Time       string  `json:"time"`
+	TimeSec    string  `json:"timeSec"`
 	DistanceKM float64 `json:"distanceKm"`
 }
 
@@ -93,11 +97,11 @@ type RideInfo struct {
 	//  - on-ride
 	//  - ride-paid
 	//  - ride-completed
-	Status string `json:"status"`
-	DriverLocation Location `json:"driverLocation"`
-	ToOrigin TravelInfo `json:"toOrigin"`
-	ToDestiny TravelInfo `json:"toDestiny"`
-	// The agent that canceled the ride. 
+	Status         string     `json:"status"`
+	DriverLocation Location   `json:"driverLocation"`
+	ToOrigin       TravelInfo `json:"toOrigin"`
+	ToDestiny      TravelInfo `json:"toDestiny"`
+	// The agent that canceled the ride.
 	// Passenger = 1, Driver = 2, System = 3
 	CancelledBy string `json:"cancelledBy"`
 	// The reason that the ride was canceled for.
@@ -112,15 +116,15 @@ type RideInfo struct {
 type RideResult struct {
 	Result
 
-	ID int `json:"rideID"`
+	ID        int       `json:"rideID"`
 	Passenger Passenger `json:"passenger"`
-	Origin Address `json:"origin"`
-	Destiny Address `json:"destiny"`
-	Driver Driver `json:"driver"`
-	Info RideInfo `json:"rideInfo"`
+	Origin    Address   `json:"origin"`
+	Destiny   Address   `json:"destiny"`
+	Driver    Driver    `json:"driver"`
+	Info      RideInfo  `json:"rideInfo"`
 }
 
-// CancellationReasonResult represents the response of listing 
+// CancellationReasonResult represents the response of listing
 // the cancellation reason of rides.
 type CancellationReasonResult struct {
 	Reasons []Base `json:"reasons"`
@@ -129,17 +133,23 @@ type CancellationReasonResult struct {
 // rideCancel contains the ride ID and reason ID.
 // pulled off for testing.
 type rideCancel struct {
-	ID int `json:"rideId"`
+	ID     int `json:"rideId"`
 	Reason int `json:"reasonId"`
 }
 
 // rideRate contains the ride ID and rating number.
-// pulled off for testing.  
+// pulled off for testing.
 type rideRate struct {
-	ID int `json:"rideId"`
+	ID     int `json:"rideId"`
 	Rating int `json:"rating"`
 }
 
+// QRCode represents a result payload when generating a QR code.
+type QRCodeResult struct {
+	Result
+
+	QRCode string `json:"qrcode"`
+}
 
 // RideService is responsible for handling
 // the requests to the ride resource.
@@ -194,6 +204,17 @@ func (rs *RideService) Rate(ctx context.Context, ride int, rating int) (*Result,
 	r := &Result{}
 
 	if err := rs.client.Request(ctx, http.MethodPost, rideEndpoint.Action(rate), &rideRate{ride, rating}, r); err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+// QRCode returns a string that when displayed as a QR code can be used on the "Embarque Imediato" feature.
+func (rs *RideService) QRCode(ctx context.Context, f Filter) (*QRCodeResult, error) {
+	r := &QRCodeResult{}
+
+	if err := rs.client.Request(ctx, http.MethodGet, rideEndpoint.Action(qrcode).Query(f.Values(qrCodeFields)), nil, r); err != nil {
 		return nil, err
 	}
 

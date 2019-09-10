@@ -1,6 +1,6 @@
 package wappa
 
-import(
+import (
 	"fmt"
 	"net/url"
 	"strings"
@@ -8,16 +8,17 @@ import(
 
 // Actions
 const (
-	nearby			= `nearby`
-	status			= `status`
-	lastRides		= `last-rides`
-	cancellationReason	= `cancellation-reason`
-	employee		= `employee`
-	cancel			= `cancel`
-	rate			= `rate`
-	update			= `update`
-	deactivate		= `deactivate`
-	activate		= `activate`
+	nearby             = `nearby`
+	status             = `status`
+	lastRides          = `last-rides`
+	cancellationReason = `cancellation-reason`
+	employee           = `employee`
+	cancel             = `cancel`
+	rate               = `rate`
+	update             = `update`
+	deactivate         = `deactivate`
+	activate           = `activate`
+	qrcode             = `qrcode`
 )
 
 // endpoint represents the path to the resource.

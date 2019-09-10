@@ -22,7 +22,7 @@ func TestRide(t *testing.T) {
 			nil,
 			&RideResult{
 				Result: Result{Success: true},
-				ID: 1,
+				ID:     1,
 			},
 		},
 		{
@@ -37,7 +37,7 @@ func TestRide(t *testing.T) {
 			&Ride{LatOrigin: 3.14},
 			&RideResult{
 				Result: Result{Success: true},
-				ID: 2,
+				ID:     2,
 			},
 		},
 		{
@@ -82,6 +82,20 @@ func TestRide(t *testing.T) {
 			&rideRate{1, 5},
 			&Result{
 				Success: true,
+			},
+		},
+		{
+			"QRCode()",
+			func(ctx context.Context, req requester) (resp interface{}, err error) {
+				resp, err = (&RideService{req}).QRCode(ctx, Filter{"employee": []string{"1"}})
+				return
+			},
+			context.Background(),
+			http.MethodGet,
+			rideEndpoint.Action(qrcode).Query(url.Values{"EmployeeId": []string{"1"}}),
+			nil,
+			&QRCodeResult{
+				Result: Result{Success: true},
 			},
 		},
 	}
@@ -133,7 +147,14 @@ func TestRideError(t *testing.T) {
 			},
 			errors.New("Error"),
 		},
-
+		{
+			"QRCode()",
+			func(req requester) error {
+				_, err := (&RideService{req}).QRCode(context.Background(), nil)
+				return err
+			},
+			errors.New("Error"),
+		},
 	}
 
 	for _, tc := range testCases {
