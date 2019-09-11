@@ -37,15 +37,17 @@ var qrCodeFields = map[string]string{
 // Ride is the  struct representing the ride
 // entity in the API.
 type Ride struct {
-	Employee       int     `json:"employeeId"`
-	TaxiType       int     `json:"taxiTypeId"`
-	TaxiCategoryId int     `json:"taxiCategoryID"`
-	LatOrigin      float64 `json:"latitudeOrigin"`
-	LngOrigin      float64 `json:"longitudeOrigin"`
-	LatDestiny     float64 `json:"latitudeDestiny"`
-	LngDestiny     float64 `json:"longitudeDestiny"`
-	OriginRef      string  `json:"originReference,omitempty"`
-	ExternalID     string  `json:"externalID,omitempty"`
+	Employee               int     `json:"employeeId"`
+	TaxiType               int     `json:"taxiTypeId"`
+	TaxiCategoryId         int     `json:"taxiCategoryID"`
+	LatOrigin              float64 `json:"latitudeOrigin"`
+	LngOrigin              float64 `json:"longitudeOrigin"`
+	LatDestiny             float64 `json:"latitudeDestiny"`
+	LngDestiny             float64 `json:"longitudeDestiny"`
+	OriginRef              string  `json:"originReference,omitempty"`
+	ExternalID             string  `json:"externalID,omitempty"`
+	PassengerPhoneAreaCode string  `json:"passengerPhoneAreaCode,omitempty"`
+	PassengerPhoneNumber   string  `json:"passengerPhoneNumber,omitempty"`
 }
 
 type Passenger struct {
