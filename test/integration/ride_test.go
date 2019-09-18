@@ -28,8 +28,8 @@ func TestRide(t *testing.T) {
 	}
 
 	ride := &wappa.Ride{
-		Employee:       empID,
-		TaxiType:       1,
+		EmployeeID:     empID,
+		TaxiTypeID:     1,
 		TaxiCategoryID: 1,
 		LatOrigin:      latOrigin,
 		LngOrigin:      lngOrigin,
