@@ -3,6 +3,7 @@ package wappa
 import (
 	"context"
 	"net/http"
+	"time"
 )
 
 const webhookEndpoint endpoint = `webhook`
@@ -10,10 +11,10 @@ const webhookEndpoint endpoint = `webhook`
 // Webhook is the  struct representing the Webhook
 // entity in the API.
 type Webhook struct {
-	URL string `json:"url"`
+	URL      string `json:"url"`
 	Endpoint string `json:"endpoint"`
-	AuthKey string `json:"authKey"`
-	Active bool `json:"active,omitempty"`
+	AuthKey  string `json:"authKey"`
+	Active   bool   `json:"active,omitempty"`
 }
 
 // WebhookResult is the API response payload.
@@ -21,6 +22,25 @@ type WebhookResult struct {
 	Result
 
 	Listeners []*Webhook `json:"listeners"`
+}
+
+// WebhookRide is the payload sent by the Webhook.
+type WebhookRide struct {
+	Code               int        `json:"code"`
+	RideID             int        `json:"rideId"`
+	CompanyID          int        `json:"companyId"`
+	EmployeeID         int        `json:"employeeId"`
+	Status             string     `json:"status"`
+	TaxiLocation       Location   `json:"taxiLocation"`
+	OriginLocation     Location   `json:"originLocation"`
+	DestinyLocation    Location   `json:"destinyLocation"`
+	TimeToOriginSec    int        `json:"timeToOriginSec"`
+	TimeToOrigin       *time.Time `json:"timeToOrigin"`
+	DistanceToOriginKM int        `json:"destanceToOriginKm"`
+	TimeToDestinySec   int        `json:"timeToDestinySec"`
+	TimeToDestiny      *time.Time `json:"timeToDestiny"`
+	RideValue          float64    `json:"rideValue"`
+	ExternalID         string     `json:"externalId"`
 }
 
 // WebhookService is responsible for handling

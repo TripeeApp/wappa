@@ -58,8 +58,8 @@ type Passenger struct {
 }
 
 type Location struct {
-	Lat  float64 `json:"latitude"`
-	Long float64 `json:"longitude"`
+	Lat float64 `json:"latitude"`
+	Lng float64 `json:"longitude"`
 }
 
 type Address struct {

@@ -46,11 +46,11 @@ func TestWebhook(t *testing.T) {
 
 	// Checks current webhhok status and toggles it, then set it to its original state.
 	if curWebhook.Active {
-		deactivate(t)
-		activate(t)
+		deactivateWebhook(t)
+		activateWebhook(t)
 	} else {
-		activate(t)
-		deactivate(t)
+		activateWebhook(t)
+		deactivateWebhook(t)
 	}
 
 	res, err := wpp.Webhook.Update(context.Background(), curWebhook)
@@ -63,7 +63,7 @@ func TestWebhook(t *testing.T) {
 	}
 }
 
-func activate(t *testing.T) {
+func activateWebhook(t *testing.T) {
 	res, err := wpp.Webhook.Activate(context.Background())
 	if err != nil {
 		t.Fatalf("got error calling Webhook.Activate(): '%s'; want nil.", err.Error())
@@ -74,7 +74,7 @@ func activate(t *testing.T) {
 	}
 }
 
-func deactivate(t *testing.T) {
+func deactivateWebhook(t *testing.T) {
 	res, err := wpp.Webhook.Deactivate(context.Background())
 	if err != nil {
 		t.Fatalf("got error calling Webhook.Deactivate(): '%s'; want nil.", err.Error())

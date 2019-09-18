@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"testing"
 	"time"
 	"unsafe"
 
@@ -22,6 +23,8 @@ const (
 	envKeyWappaHost          = "WAPPA_HOST"
 	envKeyWappaToken         = "WAPPA_AUTH_TOKEN"
 	envKeyWappaEmployeeEmail = "WAPPA_EMPLOYEE_EMAIL"
+	envKeyWappaWebhookHost   = "WAPPA_WEBHOOK_HOST"
+	envKeyWappaWebhookPort   = "WAPPA_WEBHOOK_PORT"
 )
 
 const (
@@ -100,7 +103,7 @@ func (t *transportLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.Parse()
 
 	host, err := url.Parse(os.Getenv(envKeyWappaHost))
@@ -127,6 +130,14 @@ func init() {
 	if email := os.Getenv(envKeyWappaEmployeeEmail); email != "" {
 		employeeFilter = wappa.Filter{"email": []string{email}}
 	}
+
+	// Endpoint used to indicate if the server is up. Used when testing the Ride flow.
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
+		w.WriteHeader(http.StatusOK)
+	})
+
+	os.Exit(m.Run())
 }
 
 func randString(max int, rangeBytes string) string {
