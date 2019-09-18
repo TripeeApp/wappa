@@ -109,9 +109,9 @@ type RideInfo struct {
 	// The reason that the ride was canceled for.
 	CancalledReason string `json:"cancelledReason"`
 	// The ride value, if available.
-	rideValue float64 `json:"rideValue"`
+	RideValue float64 `json:"rideValue"`
 	// The external ID provided when the ride was requested.
-	externalID string `json:externalId"`
+	ExternalID string `json:externalId"`
 }
 
 // DriverResult is the API response payload.
