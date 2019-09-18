@@ -14,29 +14,28 @@ import (
 )
 
 type testTable struct {
-	name	string
-	call	func(ctx context.Context, req requester) (resp interface{}, err error)
-	ctx	context.Context
-	method	string
-	path	endpoint
-	body	interface{}
-	wantRes	interface{}
+	name    string
+	call    func(ctx context.Context, req requester) (resp interface{}, err error)
+	ctx     context.Context
+	method  string
+	path    endpoint
+	body    interface{}
+	wantRes interface{}
 }
 
 type testTableError struct {
-	name	string
-	call	func(req requester) error
-	err	error
+	name string
+	call func(req requester) error
+	err  error
 }
 
 type testRequester struct {
-	body	interface{}
-	ctx	context.Context
-	err	error
-	method	string
-	output	reflect.Value
-	path	endpoint
-
+	body   interface{}
+	ctx    context.Context
+	err    error
+	method string
+	output reflect.Value
+	path   endpoint
 }
 
 func (t *testRequester) Request(ctx context.Context, method string, path endpoint, body, output interface{}) error {
@@ -100,9 +99,9 @@ func testError(tc testTableError) func(t *testing.T) {
 var testingMap = map[string]string{"id": "idTest"}
 
 func TestFilter(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		filter Filter
-		want url.Values
+		want   url.Values
 	}{
 		{
 			Filter{"id": []string{"123"}},
@@ -119,10 +118,10 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func TestNew(t *testing.T) {
-	testCases := []struct{
-		host	*url.URL
-		client	*http.Client
+func TestNewClient(t *testing.T) {
+	testCases := []struct {
+		host       *url.URL
+		client     *http.Client
 		wantClient *http.Client
 	}{
 		{&url.URL{}, nil, http.DefaultClient},
@@ -130,7 +129,7 @@ func TestNew(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		c := New(tc.host, tc.client)
+		c := NewClient(tc.host, tc.client)
 
 		if c.host != tc.host {
 			t.Errorf("got c.host : %s; want %s.", c.host, tc.host)
@@ -167,18 +166,20 @@ func newMockServer(handler func(w http.ResponseWriter, r *http.Request)) *httpte
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
-type dummy struct { Name string `json:"name"` }
+type dummy struct {
+	Name string `json:"name"`
+}
 
 func TestClientRequest(t *testing.T) {
 	emptyObj := []byte(`{}`)
 
-	testCases := []struct{
+	testCases := []struct {
 		endpoint endpoint
-		method	 string
-		body	 interface{}
-		server	 *httptest.Server
+		method   string
+		body     interface{}
+		server   *httptest.Server
 		output   interface{}
-		wantOut	 interface{}
+		wantOut  interface{}
 	}{
 		{
 			"",
@@ -267,7 +268,7 @@ func TestClientRequest(t *testing.T) {
 		output := tc.output
 
 		u, _ := url.Parse(tc.server.URL)
-		c := New(u, nil)
+		c := NewClient(u, nil)
 
 		err := c.Request(context.Background(), tc.method, tc.endpoint, tc.body, output)
 		if err != nil {
@@ -284,12 +285,12 @@ func TestClientRequest(t *testing.T) {
 }
 
 func TestClientRequestError(t *testing.T) {
-	testCases := []struct{
-		path		endpoint
-		method		string
-		body		interface{}
-		server		*httptest.Server
-		assertError	func(e error)
+	testCases := []struct {
+		path        endpoint
+		method      string
+		body        interface{}
+		server      *httptest.Server
+		assertError func(e error)
 	}{
 		{
 			":",
@@ -348,7 +349,7 @@ func TestClientRequestError(t *testing.T) {
 
 	for _, tc := range testCases {
 		u, _ := url.Parse(tc.server.URL)
-		c := New(u, nil)
+		c := NewClient(u, nil)
 
 		err := c.Request(context.Background(), tc.method, tc.path, tc.body, &dummy{})
 		if err == nil {
@@ -380,7 +381,7 @@ func TestClientRequestWithContext(t *testing.T) {
 	cancel()
 
 	u, _ := url.Parse(s.URL)
-	c := New(u, nil)
+	c := NewClient(u, nil)
 
 	if err := c.Request(ctx, http.MethodGet, "/", nil, nil); err == nil {
 		t.Errorf("got error nil; want not nil")
@@ -389,9 +390,9 @@ func TestClientRequestWithContext(t *testing.T) {
 
 func TestClientStatus(t *testing.T) {
 
-	testCases := []struct{
-		server	 *httptest.Server
-		wantOK	 bool
+	testCases := []struct {
+		server *httptest.Server
+		wantOK bool
 	}{
 		{
 			newMockServer(func(w http.ResponseWriter, r *http.Request) {
@@ -421,14 +422,14 @@ func TestClientStatus(t *testing.T) {
 
 	for _, tc := range testCases {
 		u, _ := url.Parse(tc.server.URL)
-		c := New(u, nil)
+		c := NewClient(u, nil)
 
 		ok, err := c.Status(context.Background())
 		if err != nil {
 			t.Fatalf("got error calling Client.Status(context.Background()): %s; want nil.", err.Error())
 		}
 
-		if ok != tc.wantOK{
+		if ok != tc.wantOK {
 			t.Errorf("got output from Client.Status(): %+v; want %+v.", ok, tc.wantOK)
 		}
 
@@ -437,8 +438,8 @@ func TestClientStatus(t *testing.T) {
 }
 
 func TestClientStatusError(t *testing.T) {
-	testCases := []struct{
-		server		*httptest.Server
+	testCases := []struct {
+		server *httptest.Server
 	}{
 		{
 			httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})),
@@ -447,7 +448,7 @@ func TestClientStatusError(t *testing.T) {
 
 	for _, tc := range testCases {
 		u, _ := url.Parse(tc.server.URL)
-		c := New(u, nil)
+		c := NewClient(u, nil)
 
 		_, err := c.Status(context.Background())
 		if err == nil {
@@ -475,7 +476,7 @@ func TestClientStatusWithContext(t *testing.T) {
 	cancel()
 
 	u, _ := url.Parse(s.URL)
-	c := New(u, nil)
+	c := NewClient(u, nil)
 
 	if _, err := c.Status(ctx); err == nil {
 		t.Errorf("got error nil; want not nil")

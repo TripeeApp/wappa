@@ -114,7 +114,7 @@ func TestMain(m *testing.M) {
 	token := os.Getenv(envKeyWappaToken)
 	if token == "" {
 		fmt.Println("No auth token. Some tests may not run!")
-		wpp = wappa.New(host, nil)
+		wpp = wappa.NewClient(host, nil)
 	} else {
 		host, _ := url.Parse(os.Getenv(envKeyWappaHost))
 
@@ -122,7 +122,7 @@ func TestMain(m *testing.M) {
 		hc := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: token},
 		))
-		wpp = wappa.New(host, hc)
+		wpp = wappa.NewClient(host, hc)
 
 		auth = true
 	}

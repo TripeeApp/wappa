@@ -12,8 +12,8 @@ import (
 )
 
 // requester is the interface that performs a request
-// to the server and delegates the persing to the parser interface. 
-type requester interface{
+// to the server and delegates the persing to the parser interface.
+type requester interface {
 	Request(ctx context.Context, method string, path endpoint, body, output interface{}) error
 }
 
@@ -35,23 +35,23 @@ func (f Filter) Values(fields map[string]string) url.Values {
 
 // ResponseError contains the default error porperties
 // returnes by the API.
-type ResponseError struct{
-	Code int
+type ResponseError struct {
+	Code    int
 	Message int
 }
 
 // Result contains the base porperties
 // all requests to the Wappa API returns.
-type Result struct{
+type Result struct {
 	Success bool
-	Error ResponseError
+	Error   ResponseError
 	// Returned by the API when error occurs
 	Message string
 }
 
 // ApiError implements the error interface
 // and returns infos from the request.
-type ApiError struct{
+type ApiError struct {
 	statusCode int
 	msg        string
 }
@@ -60,13 +60,12 @@ func (e *ApiError) Error() string {
 	return fmt.Sprintf("Error Status Code: %d; Message: %s.", e.statusCode, e.msg)
 }
 
-
 type service struct {
 	client requester
 }
 
 // Client is responsible for handling requests to the Wappa API.
-type Client struct{
+type Client struct {
 	// client to comunicate with the API.
 	client *http.Client
 
@@ -78,15 +77,15 @@ type Client struct{
 	common service
 
 	// Services implemented
-	Driver *DriverService
+	Driver   *DriverService
 	Employee *EmployeeService
-	Quote *QuoteService
-	Ride *RideService
-	Webhook *WebhookService
+	Quote    *QuoteService
+	Ride     *RideService
+	Webhook  *WebhookService
 }
 
-// Client returns a new Wappa API client with provided host URL and HTTP client.
-func New(host *url.URL, client *http.Client) *Client {
+// NewClient returns a new Wappa API client with provided host URL and HTTP client.
+func NewClient(host *url.URL, client *http.Client) *Client {
 	if client == nil {
 		client = http.DefaultClient
 	}
@@ -137,7 +136,7 @@ func (c *Client) Request(ctx context.Context, method string, path endpoint, body
 	if err := json.Unmarshal(bd, output); err != nil {
 		return &ApiError{
 			statusCode: res.StatusCode,
-			msg: fmt.Sprintf("Couldn't unmarshal body: '%s'. Message: '%s'.",  string(bd), err.Error()),
+			msg:        fmt.Sprintf("Couldn't unmarshal body: '%s'. Message: '%s'.", string(bd), err.Error()),
 		}
 	}
 
@@ -148,7 +147,7 @@ func (c *Client) Request(ctx context.Context, method string, path endpoint, body
 var statusEndpoint endpoint = `status`
 
 // Status returns the API status.
-func (c *Client) Status(ctx context.Context) (ok bool, err error){
+func (c *Client) Status(ctx context.Context) (ok bool, err error) {
 	u, err := c.host.Parse(statusEndpoint.String())
 	if err != nil {
 		return

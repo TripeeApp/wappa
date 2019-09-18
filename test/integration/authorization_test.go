@@ -50,5 +50,5 @@ func getOauthAppClient(t *testing.T) *wappa.Client {
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, loggingHTTPClient())
 
-	return wappa.New(u, oauth2.NewClient(ctx, wappa.NewTokenSource(ctx, host, username, password)))
+	return wappa.NewClient(u, oauth2.NewClient(ctx, wappa.NewTokenSource(ctx, host, username, password)))
 }

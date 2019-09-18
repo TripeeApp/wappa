@@ -30,7 +30,7 @@ func TestRide(t *testing.T) {
 	ride := &wappa.Ride{
 		Employee:       empID,
 		TaxiType:       1,
-		TaxiCategoryId: 1,
+		TaxiCategoryID: 1,
 		LatOrigin:      latOrigin,
 		LngOrigin:      lngOrigin,
 		LatDestiny:     latDest,
@@ -163,7 +163,7 @@ func TestRide(t *testing.T) {
 //	ride := &wappa.Ride{
 //		Employee:       empID,
 //		TaxiType:       1,
-//		TaxiCategoryId: 1,
+//		TaxiCategoryID: 1,
 //		LatOrigin:      latOrigin,
 //		LngOrigin:      lngOrigin,
 //		LatDestiny:     latDest,
