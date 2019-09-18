@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mobilitee-smartmob/wappa"
+	wappa "github.com/mobilitee-smartmob/wappa/v2"
 )
 
 func TestWebhook(t *testing.T) {
