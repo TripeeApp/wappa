@@ -1,4 +1,4 @@
-module github.com/mobilitee-smartmob/wappa
+module github.com/mobilitee-smartmob/wappa/v2
 
 go 1.13
 

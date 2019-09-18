@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/mobilitee-smartmob/wappa"
+	wappa "github.com/mobilitee-smartmob/wappa/v2"
 )
 
 func TestEmployee(t *testing.T) {

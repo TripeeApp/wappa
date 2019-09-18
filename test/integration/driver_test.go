@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/mobilitee-smartmob/wappa"
+	wappa "github.com/mobilitee-smartmob/wappa/v2"
 )
 
 func TestDriver(t *testing.T) {

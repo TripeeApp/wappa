@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mobilitee-smartmob/wappa"
+	wappa "github.com/mobilitee-smartmob/wappa/v2"
 )
 
 func TestRide(t *testing.T) {
