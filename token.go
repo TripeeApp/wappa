@@ -12,8 +12,8 @@ import (
 // TokenSource implements the oauth2.TokenSource interface,
 // in order to reuse the Wappa token.
 type TokenSource struct {
-	ctx context.Context
-	conf *oauth2.Config
+	ctx      context.Context
+	conf     *oauth2.Config
 	username string
 	password string
 }
@@ -25,7 +25,7 @@ type TokenSource struct {
 func NewTokenSource(ctx context.Context, host, username, password string) *TokenSource {
 	conf := &oauth2.Config{
 		// ClientID and ClientSecret not used in this version
-		ClientID: "",
+		ClientID:     "",
 		ClientSecret: "",
 		Endpoint: oauth2.Endpoint{
 			TokenURL: fmt.Sprintf("%stoken", host),
@@ -33,8 +33,8 @@ func NewTokenSource(ctx context.Context, host, username, password string) *Token
 	}
 
 	return &TokenSource{
-		ctx: ctx,
-		conf: conf,
+		ctx:      ctx,
+		conf:     conf,
 		username: username,
 		password: password,
 	}
@@ -48,7 +48,7 @@ func (ts *TokenSource) Token() (*oauth2.Token, error) {
 	}
 
 	token, err := jwt.Parse(tk.AccessToken, nil)
-	if token == nil{
+	if token == nil {
 		return nil, fmt.Errorf("invalid JWT token: '%s'.", tk.AccessToken)
 	}
 
@@ -58,8 +58,8 @@ func (ts *TokenSource) Token() (*oauth2.Token, error) {
 	}
 
 	var expTime time.Time
-	if exp, ok := claims["exp"].(int64); ok {
-		expTime = time.Unix(exp, 0)
+	if exp, ok := claims["exp"].(float64); ok {
+		expTime = time.Unix(int64(exp), 0)
 	}
 
 	tk.Expiry = expTime

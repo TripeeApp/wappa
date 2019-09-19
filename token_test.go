@@ -45,18 +45,14 @@ func TestNewTokenSource(t *testing.T) {
 	}
 }
 
-func TestTokenSourceToken(t *testing.T) {
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		expected := "/token"
-		if r.URL.String() != expected {
-			t.Errorf("URL = %q; want %q", r.URL, expected)
-		}
+func tokenServer(exp time.Duration) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mySigningKey := []byte("AllYourBase")
 
 		// Create the Claims
 		claims := &jwt.StandardClaims{
-		    ExpiresAt: time.Now().Add(30 * time.Minute).Unix(),
-		    Issuer:    "test",
+			ExpiresAt: time.Now().Add(exp).Unix(),
+			Issuer:    "test",
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -64,12 +60,33 @@ func TestTokenSourceToken(t *testing.T) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(fmt.Sprintf(`{"access_token": "%s"}`, ss)))
+
 	}))
-	defer s.Close()
+}
 
-	ts := NewTokenSource(context.Background(), s.URL + "/", "", "")
+func TestTokenSourceToken(t *testing.T) {
+	testCases := []struct {
+		server *httptest.Server
+		want   bool
+	}{
+		{tokenServer(30 * time.Minute), true},
+		{tokenServer(-30 * time.Minute), false},
+	}
 
-	if _, err := ts.Token(); err != nil {
-		t.Errorf("got error calling Token(): '%s'; want nil.", err.Error())
+	for _, tc := range testCases {
+
+		ts := NewTokenSource(context.Background(), tc.server.URL+"/", "", "")
+
+		tk, err := ts.Token()
+		if err != nil {
+			t.Fatalf("got error calling Token(): '%s'; want nil.", err.Error())
+		}
+
+		fmt.Println(tk.Expiry)
+
+		if got := tk.Valid(); got != tc.want {
+			t.Errorf("got token.Valid(): %t; want %t.", got, tc.want)
+		}
+		tc.server.Close()
 	}
 }
