@@ -9,51 +9,52 @@ import (
 const quoteEndpoint endpoint = `estimate`
 
 var quoteFields = map[string]string{
-	"placeOrigin": "PlaceIdOrigin",
+	"placeOrigin":  "PlaceIdOrigin",
 	"placeDestiny": "PlaceIdDestiny",
-	"latOrigin": "LatitudeOrigin",
-	"lngOrigin": "LongitudeOrigin",
-	"latDest": "LatitudeDestiny",
-	"lngDest": "LongitudeDestiny",
-	"employee": "EmployeeId",
+	"latOrigin":    "LatitudeOrigin",
+	"lngOrigin":    "LongitudeOrigin",
+	"latDest":      "LatitudeDestiny",
+	"lngDest":      "LongitudeDestiny",
+	"employee":     "EmployeeId",
 }
 
 type Estimate struct {
-	Minimum float64 `json:"minimum"`
-	Maximum float64 `json:"maximum"`
-	Distance float64 `json:"distance"`
-	Journey float64 `json:"distance"`
+	Minimum      float64     `json:"minimum"`
+	Maximum      float64     `json:"maximum"`
+	Distance     float64     `json:"distance"` // Measured in KM.
+	Journey      DurationMin `json:"journey"`
+	TimeToPickup DurationSec `json:"timeToPickupValue"`
 }
 
 type Icon struct {
 	Default string `json:"default"`
 	OnFocus string `json:"onFocus"`
-	Pin string `json:"pin"`
+	Pin     string `json:"pin"`
 }
 
 // The available subcategories for this category.
 type SubCategory struct {
-	ID int `json:"id"`
-	TypeID int `json:"typeId"`
-	Default bool `json:"default"`
-	Description string `json:"description"`
-	Discount float64 `json:"discount"`
-	Estimate Estimate  `json:"estimate"`
-	Observation string `json:"observation"`
-	Icon Icon  `json:"icon"`
+	ID          int      `json:"id"`
+	TypeID      int      `json:"typeId"`
+	Default     bool     `json:"default"`
+	Description string   `json:"description"`
+	Discount    float64  `json:"discount"`
+	Estimate    Estimate `json:"estimate"`
+	Observation string   `json:"observation"`
+	Icon        Icon     `json:"icon"`
 }
 
 // The categories available for the region requested.
 type Category struct {
-	ID int `json:"id"`
-	Description string `json:"description"`
-	SubCategories []SubCategory  `json:"subcategories"`
+	ID            int           `json:"id"`
+	Description   string        `json:"description"`
+	SubCategories []SubCategory `json:"subcategories"`
 }
 
 // DriverResult is the API response payload.
 type QuoteResult struct {
-	Categories []*Category  `json:"categories"`
-	EstimatedAt *time.Time `json:"date"`
+	Categories  []*Category `json:"categories"`
+	EstimatedAt *time.Time  `json:"date"`
 }
 
 // QuoteService is responsible for handling
