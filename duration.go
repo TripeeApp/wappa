@@ -2,8 +2,30 @@ package wappa
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 )
+
+// Duration is a time duration represented as hh:mm:ss.
+type Duration struct {
+	time.Duration
+}
+
+func (d *Duration) UnmarshalJSON(b []byte) (err error) {
+	var dur string
+	if err = json.Unmarshal(b, &dur); err != nil {
+		return
+	}
+
+	parts := strings.Split(dur, ":")
+	if len(parts) < 3 {
+		return nil
+	}
+
+	d.Duration, err = time.ParseDuration(fmt.Sprintf("%sh%sm%ss", parts[0], parts[1], parts[2]))
+	return nil
+}
 
 // DurationSec is a custom seconds duration type for
 // unmashaling data from the API.
@@ -28,17 +50,12 @@ func (d *DurationMin) UnmarshalJSON(b []byte) (err error) {
 }
 
 func parseDuration(b []byte, unit time.Duration) (time.Duration, error) {
+	var f float64
 	var d time.Duration
 
-	s := string(b)
-	// By convention, to approximate the behaviour of Unmarshal itself,
-	// Unmarshalers implement UnmarshalJSON([]byte("null")) as a no-op.
-	if s == "null" {
-		return d, nil
-	}
-	n, err := json.Number(s).Float64()
+	err := json.Unmarshal(b, &f)
 
-	d = time.Duration(n) * unit
+	d = time.Duration(f) * unit
 
 	return d, err
 }

@@ -3,7 +3,6 @@ package wappa
 import (
 	"context"
 	"net/http"
-	"time"
 )
 
 const webhookEndpoint endpoint = `webhook`
@@ -26,21 +25,21 @@ type WebhookResult struct {
 
 // WebhookRide is the payload sent by the Webhook.
 type WebhookRide struct {
-	Code               int        `json:"code"`
-	RideID             int        `json:"rideId"`
-	CompanyID          int        `json:"companyId"`
-	EmployeeID         int        `json:"employeeId"`
-	Status             string     `json:"status"`
-	TaxiLocation       Location   `json:"taxiLocation"`
-	OriginLocation     Location   `json:"originLocation"`
-	DestinyLocation    Location   `json:"destinyLocation"`
-	TimeToOriginSec    int        `json:"timeToOriginSec"`
-	TimeToOrigin       *time.Time `json:"timeToOrigin"`
-	DistanceToOriginKM int        `json:"destanceToOriginKm"`
-	TimeToDestinySec   int        `json:"timeToDestinySec"`
-	TimeToDestiny      *time.Time `json:"timeToDestiny"`
-	RideValue          float64    `json:"rideValue"`
-	ExternalID         string     `json:"externalId"`
+	Code               int      `json:"code"`
+	RideID             int      `json:"rideId"`
+	CompanyID          int      `json:"companyId"`
+	EmployeeID         int      `json:"employeeId"`
+	Status             string   `json:"status"`
+	TaxiLocation       Location `json:"taxiLocation"`
+	OriginLocation     Location `json:"originLocation"`
+	DestinyLocation    Location `json:"destinyLocation"`
+	TimeToOriginSec    int      `json:"timeToOriginSec"`
+	TimeToOrigin       Duration `json:"timeToOrigin"`
+	DistanceToOriginKM int      `json:"destanceToOriginKm"`
+	TimeToDestinySec   int      `json:"timeToDestinySec"`
+	TimeToDestiny      Duration `json:"timeToDestiny"`
+	RideValue          float64  `json:"rideValue"`
+	ExternalID         string   `json:"externalId"`
 }
 
 // WebhookService is responsible for handling
@@ -49,9 +48,9 @@ type WebhookService service
 
 // Read returns the webhooks created in the API.
 func (ws *WebhookService) Read(ctx context.Context) (*WebhookResult, error) {
-	wr := &WebhookResult{}
+	wr := new(WebhookResult)
 
-	if err := ws.client.Request(ctx, http.MethodGet, webhookEndpoint, nil, wr); err != nil {
+	if _, err := ws.client.Request(ctx, http.MethodGet, webhookEndpoint, nil, wr); err != nil {
 		return nil, err
 	}
 
@@ -60,9 +59,9 @@ func (ws *WebhookService) Read(ctx context.Context) (*WebhookResult, error) {
 
 // Create creates a webhook resource in the API.
 func (ws *WebhookService) Create(ctx context.Context, w *Webhook) (*Result, error) {
-	res := &Result{}
+	res := new(Result)
 
-	if err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint, w, res); err != nil {
+	if _, err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint, w, res); err != nil {
 		return nil, err
 	}
 
@@ -73,7 +72,9 @@ func (ws *WebhookService) Create(ctx context.Context, w *Webhook) (*Result, erro
 func (ws *WebhookService) Update(ctx context.Context, w *Webhook) (*Result, error) {
 	res := &Result{}
 
-	if err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint.Action(update), w, res); err != nil {
+	u := webhookEndpoint.Action(update)
+
+	if _, err := ws.client.Request(ctx, http.MethodPost, u, w, res); err != nil {
 		return nil, err
 	}
 
@@ -84,7 +85,9 @@ func (ws *WebhookService) Update(ctx context.Context, w *Webhook) (*Result, erro
 func (ws *WebhookService) Activate(ctx context.Context) (*Result, error) {
 	res := &Result{}
 
-	if err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint.Action(activate), nil, res); err != nil {
+	u := webhookEndpoint.Action(activate)
+
+	if _, err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
 		return nil, err
 	}
 
@@ -95,7 +98,9 @@ func (ws *WebhookService) Activate(ctx context.Context) (*Result, error) {
 func (ws *WebhookService) Deactivate(ctx context.Context) (*Result, error) {
 	res := &Result{}
 
-	if err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint.Action(deactivate), nil, res); err != nil {
+	u := webhookEndpoint.Action(deactivate)
+
+	if _, err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
 		return nil, err
 	}
 

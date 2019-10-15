@@ -7,6 +7,28 @@ import (
 	"time"
 )
 
+func TestDurationUnmarshal(t *testing.T) {
+	testCases := []struct {
+		payload []byte
+		want    Duration
+	}{
+		{[]byte(`"00:10:00"`), Duration{time.Duration(10) * time.Minute}},
+		{[]byte(`"10:00"`), Duration{}},
+		{[]byte(`null`), Duration{}},
+	}
+
+	for _, tc := range testCases {
+		var got Duration
+		if err := json.Unmarshal(tc.payload, &got); err != nil {
+			t.Fatalf("got error calling json.Unmarshal(%s): '%s'; want nil.", tc.payload, err.Error())
+		}
+
+		if !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("got Duration %+v; want %+v.", got, tc.want)
+		}
+	}
+}
+
 func TestDurationSecUnmarshal(t *testing.T) {
 	testCases := []struct {
 		payload []byte
@@ -17,7 +39,7 @@ func TestDurationSecUnmarshal(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got := DurationSec{}
+		var got DurationSec
 		if err := json.Unmarshal(tc.payload, &got); err != nil {
 			t.Fatalf("got error calling json.Unmarshal(%s): '%s'; want nil.", tc.payload, err.Error())
 		}
@@ -46,7 +68,7 @@ func TestDurationMinUnmarshal(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got := DurationMin{}
+		var got DurationMin
 		if err := json.Unmarshal(tc.payload, &got); err != nil {
 			t.Fatalf("got error calling json.Unmarshal(%s): '%s'; want nil.", tc.payload, err.Error())
 		}
