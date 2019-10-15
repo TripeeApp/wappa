@@ -50,7 +50,7 @@ type WebhookService service
 func (ws *WebhookService) Read(ctx context.Context) (*WebhookResult, error) {
 	wr := new(WebhookResult)
 
-	if _, err := ws.client.Request(ctx, http.MethodGet, webhookEndpoint, nil, wr); err != nil {
+	if err := ws.client.Request(ctx, http.MethodGet, webhookEndpoint, nil, wr); err != nil {
 		return nil, err
 	}
 
@@ -61,7 +61,7 @@ func (ws *WebhookService) Read(ctx context.Context) (*WebhookResult, error) {
 func (ws *WebhookService) Create(ctx context.Context, w *Webhook) (*Result, error) {
 	res := new(Result)
 
-	if _, err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint, w, res); err != nil {
+	if err := ws.client.Request(ctx, http.MethodPost, webhookEndpoint, w, res); err != nil {
 		return nil, err
 	}
 
@@ -74,7 +74,7 @@ func (ws *WebhookService) Update(ctx context.Context, w *Webhook) (*Result, erro
 
 	u := webhookEndpoint.Action(update)
 
-	if _, err := ws.client.Request(ctx, http.MethodPost, u, w, res); err != nil {
+	if err := ws.client.Request(ctx, http.MethodPost, u, w, res); err != nil {
 		return nil, err
 	}
 
@@ -87,7 +87,7 @@ func (ws *WebhookService) Activate(ctx context.Context) (*Result, error) {
 
 	u := webhookEndpoint.Action(activate)
 
-	if _, err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
+	if err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
 		return nil, err
 	}
 
@@ -100,7 +100,7 @@ func (ws *WebhookService) Deactivate(ctx context.Context) (*Result, error) {
 
 	u := webhookEndpoint.Action(deactivate)
 
-	if _, err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
+	if err := ws.client.Request(ctx, http.MethodPost, u, nil, res); err != nil {
 		return nil, err
 	}
 
