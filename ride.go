@@ -111,7 +111,7 @@ type RideInfo struct {
 	// The ride value, if available.
 	RideValue float64 `json:"rideValue"`
 	// The external ID provided when the ride was requested.
-	ExternalID string `json:externalId"`
+	ExternalID string `json:"externalId"`
 }
 
 // DriverResult is the API response payload.
