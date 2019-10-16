@@ -84,9 +84,9 @@ type Driver struct {
 }
 
 type TravelInfo struct {
-	Time       string  `json:"time"`
-	TimeSec    string  `json:"timeSec"`
-	DistanceKM float64 `json:"distanceKm"`
+	Time       Duration `json:"time"`
+	TimeSec    int      `json:"timeSec"`
+	DistanceKM float64  `json:"distanceKm"`
 }
 
 type RideInfo struct {
